@@ -1,30 +1,38 @@
+version: "3.9"
+
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:16
     environment:
-      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: carboncore
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports: ["5432:5432"]
 
   redis:
-    image: redis:7-alpine
+    image: redis:7
     ports: ["6379:6379"]
 
   backend:
-    build: ./backend
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    volumes:
+      - ./backend:/code
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/carboncore
       REDIS_URL: redis://redis:6379/0
-    volumes: ["./backend:/code"]
     depends_on: [db, redis]
     ports: ["8000:8000"]
 
-  web:
-    build: ./web
+  celery:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    command: celery -A app.tasks.worker worker -B --loglevel=info
+    volumes:
+      - ./backend:/code
     environment:
-      NEXT_PUBLIC_API_URL: http://backend:8000
-    volumes: ["./web:/app"]
-    depends_on: [backend]
-    ports: ["3000:3000"]
-
- 
+      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/carboncore
+      REDIS_URL: redis://redis:6379/0
+    depends_on: [backend, redis]

@@ -1,27 +1,35 @@
-"""
-Carbon-intensity feed with 5-minute in-memory cache
-(works with aiocache ≥ 1.0).
-"""
-from aiocache import cached, SimpleMemoryCache
-import httpx
+"""Resilient CO₂-intensity fetch with ElectrictyMaps ↔ WattTime fallback."""
+import asyncio
 
-from ..core.settings import get_settings
+from httpx import AsyncClient
+from tenacity import retry, stop_after_attempt, wait_exponential
 
-settings = get_settings()
-
-
-async def _fetch_intensity(region: str) -> float:
-    url = (
-        "https://api.electricitymaps.com/v3/co2-intensity/latest"
-        f"?zone={region}"
-    )
-    headers = {"auth-token": settings.electricitymaps_api_key}
-    async with httpx.AsyncClient(timeout=5) as client:
-        resp = await client.get(url, headers=headers)
-        resp.raise_for_status()
-    return resp.json()["data"]["carbonIntensity"]
+_EM = "https://api.electricitymaps.com/v3/zone"
+_WT = "https://api.watttime.org/v2"
+_TIMEOUT = 10
 
 
-@cached(ttl=300, cache=SimpleMemoryCache)  # 5 min
-async def get_intensity(region: str) -> float:
-    return await _fetch_intensity(region)
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=0.3))
+async def _em_intensity(zone: str) -> float:
+    async with AsyncClient(timeout=_TIMEOUT) as http:
+        r = await http.get(f"{_EM}/{zone}")
+        r.raise_for_status()
+        return r.json()["zone_data"]["co2intensity"]
+
+
+@retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=0.3))
+async def _wt_intensity(zone: str) -> float:
+    async with AsyncClient(timeout=_TIMEOUT) as http:
+        r = await http.get(f"{_WT}/intensity/{zone}")
+        r.raise_for_status()
+        return r.json()["data"]["avg_co2"]
+
+
+async def fetch_intensity(zone: str) -> float:
+    t1 = asyncio.create_task(_em_intensity(zone))
+    t2 = asyncio.create_task(_wt_intensity(zone))
+    done, _ = await asyncio.wait({t1, t2}, return_when=asyncio.FIRST_COMPLETED)
+    return done.pop().result()
+
+# ───── backwards-compat (old code imports this) ────────────────
+get_intensity = fetch_intensity
