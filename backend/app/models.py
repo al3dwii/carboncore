@@ -2,6 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from sqlmodel import Field, SQLModel
 from uuid import UUID, uuid4
+from passlib.hash import bcrypt
 
 class Sku(SQLModel, table=True):
     id: str = Field(primary_key=True)
@@ -26,3 +27,17 @@ class SavingEvent(SQLModel, table=True):
     co2: float
     usd: Decimal
     created_at: datetime = Field(default_factory=datetime.utcnow, index=True)
+
+class ProjectToken(SQLModel, table=True):
+    id: UUID | None = Field(default_factory=uuid4, primary_key=True)
+    name: str
+    token_hash: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+    @staticmethod
+    def hash(raw: str) -> str:
+        return bcrypt.hash(raw)
+
+    @staticmethod
+    def verify(raw: str, hashed: str) -> bool:
+        return bcrypt.verify(raw, hashed)

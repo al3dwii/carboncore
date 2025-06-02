@@ -3,6 +3,7 @@ services:
     image: postgres:16-alpine
     environment:
       POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: carboncore
     ports: ["5432:5432"]
 
   redis:
@@ -25,3 +26,5 @@ services:
     volumes: ["./web:/app"]
     depends_on: [backend]
     ports: ["3000:3000"]
+
+ 
