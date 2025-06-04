@@ -25,3 +25,6 @@ docker-volume/
 # ── IDE files ───────────────────────────────────────────────────────────
 .vscode/
 .idea/
+node_modules/
+# macOS
+.DS_Store
