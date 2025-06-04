@@ -21,8 +21,12 @@ if str(BACKEND_DIR) not in sys.path:
 
 import os
 
+# Force all tests to run under asyncio
+os.environ.setdefault("ANYIO_BACKEND", "asyncio")
+
+import pytest
 import pytest_asyncio
-from httpx import AsyncClient
+from httpx import AsyncClient, ASGITransport
 
 os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///:memory:")  # noqa: E402
 
@@ -34,5 +38,12 @@ from app.core.deps import init_db
 async def client():
     """Reusable async HTTP client bound to the FastAPI app."""
     await init_db()
-    async with AsyncClient(app=app, base_url="http://test") as ac:
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
+
+
+@pytest.fixture
+def anyio_backend():
+    """Force pytest-anyio to use asyncio only."""
+    return "asyncio"

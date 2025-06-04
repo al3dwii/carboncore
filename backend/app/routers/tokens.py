@@ -112,17 +112,30 @@ async def list_tokens(
     return paginate(records, params)
 
 
+# Also serve /tokens without the trailing slash
+@router.get("", response_model=list[ProjectToken])
+@limiter.limit("60/minute")
+async def list_tokens_no_slash(
+    request: Request,
+    db: AsyncSession = Depends(get_db),
+):
+    stmt = select(ProjectToken)
+    records = (await db.scalars(stmt)).all()
+    return records
+
+
 @router.delete("/{token_id}", status_code=status.HTTP_204_NO_CONTENT)
 @limiter.limit("30/minute")
 async def revoke_token(
-    token_id: UUID,
+    token_id: str,
     request: Request,                     # noqa: D401
     db: AsyncSession = Depends(get_db),
 ):
-    stmt = select(ProjectToken).where(ProjectToken.id == token_id)
+    tid = UUID(token_id)
+    stmt = select(ProjectToken).where(ProjectToken.id == tid)
     rec = (await db.scalars(stmt)).first()
     if not rec:
         raise HTTPException(status_code=404, detail="token not found")
     await db.delete(rec)
     await db.commit()
-    log.info("token.revoked", token_id=str(token_id))
+    log.info("token.revoked", token_id=str(tid))
