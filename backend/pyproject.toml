@@ -36,6 +36,8 @@ greenlet = "^3.2.2"
 # Caching
 redis = { extras = ["hiredis"], version = "^5.0.4" }
 
+aiosqlite = "^0.20.0"
+
 # Logging
 structlog = "^25.4.0"
 
@@ -58,7 +60,6 @@ pytest               = "^8.2.0"
 pytest-asyncio       = "^0.23.6"
 anyio                = "^4.3.0"
 trio                 = "^0.30.0"
-aiosqlite            = "^0.20.0"
 ruff                 = "^0.4.4"
 mypy                 = "^1.10.0"
 types-requests       = "^2.31.0.20240218"
