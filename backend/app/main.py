@@ -1,15 +1,67 @@
+"""
+CarbonCore FastAPI entry-point (v0.1.0-beta).
+
+Highlights
+──────────
+• Secure Headers, CORS and global SlowAPI rate-limiting
+• JSON logs via `core.logging.init_logging`
+• OTEL traces (FastAPI + httpx + SQLAlchemy) via `core.otel.init_otel`
+• Prometheus /metrics (compressed) via Instrumentator
+• Pagination wired globally (`fastapi_pagination`)
+• Health/ready probes & blue/green root-path support
+"""
+
+from __future__ import annotations
+
+from contextlib import asynccontextmanager
+from datetime import datetime
+from typing import Final
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
+from prometheus_fastapi_instrumentator import Instrumentator
+from starlette.middleware.secure_headers import SecureHeadersMiddleware
+import structlog
 
-from .core.ratelimit import attach
-from .core.deps import init_db
-from .routers import skus, tokens, carbon
+from .core.deps import init_db, engine
+from .core.logging import init_logging
+from .core.otel import init_otel
+from .core.ratelimit import attach as attach_rate_limit
+from .core.settings import settings
+from .routers import carbon, events, skus, tokens
 
-app = FastAPI(title="CarbonCore API", version="0.1.0-beta.1", docs_url="/")
+# ──────────────── logging bootstrap ────────────────────────────
+init_logging()                      # JSON logs straight to STDOUT
+log = structlog.get_logger()
 
-# CORS (wide-open for now)
+# ──────────────── lifespan hook ────────────────────────────────
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    log.info("lifespan.start", env=getattr(settings, "ENV", "dev"))
+    await init_db()
+    yield
+    log.info("lifespan.stop")
+
+
+# ──────────────── middleware list ──────────────────────────────
+MIDDLEWARE: Final = []
+if getattr(settings, "SECURE_HEADERS", True):
+    MIDDLEWARE.append({"middleware_class": SecureHeadersMiddleware})
+
+# ──────────────── FastAPI factory ──────────────────────────────
+app = FastAPI(
+    title="CarbonCore API",
+    version=getattr(settings, "BUILD_SHA", "0.1.0-beta.1"),
+    docs_url="/",
+    redoc_url=None,
+    root_path=f"/{settings.BLUE_GREEN_COLOR}" if getattr(settings, "BLUE_GREEN_COLOR", "") else "",
+    lifespan=lifespan,
+    middleware=MIDDLEWARE,
+)
+
+# CORS (wide-open for now; tighten before GA)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -19,19 +71,53 @@ app.add_middleware(
 )
 
 # Routers
-app.include_router(skus.router)
-app.include_router(tokens.router)
-app.include_router(carbon.router)
+for router in (skus.router, tokens.router, events.router, carbon.router):
+    app.include_router(router)
 
-# Rate-limit & pagination
-attach(app)
+# Global helpers
+attach_rate_limit(app)
 add_pagination(app)
 
+# Health / readiness probes
+@app.get("/healthz", include_in_schema=False)
+async def healthz() -> dict[str, str]:
+    return {"status": "ok", "ts": datetime.utcnow().isoformat()}
 
-@app.on_event("startup")
-async def _startup() -> None:  # noqa: D401
-    await init_db()
 
+@app.get("/readyz", include_in_schema=False)
+async def readyz() -> dict[str, str]:
+    return {
+        "status": "ready",
+        "instance": getattr(settings, "INSTANCE_ID", "local"),
+        "color": getattr(settings, "BLUE_GREEN_COLOR", "default"),
+    }
 
-if __name__ == "__main__":
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+# ──────────────── Prometheus metrics ───────────────────────────
+if getattr(settings, "ENABLE_METRICS", True):
+    Instrumentator().instrument(app).expose(
+        app,
+        endpoint="/metrics",
+        include_in_schema=False,
+        should_gzip=True,
+    )
+    log.info("prometheus.enabled")
+
+# ──────────────── OpenTelemetry traces ─────────────────────────
+if getattr(settings, "ENABLE_TRACING", True):
+    try:
+        init_otel(app, engine)
+        log.info("otel.enabled")
+    except ImportError:             # pragma: no cover
+        log.warning("otel.not_installed")
+
+log.info("app.initialised")
+
+# ─────────── local developer entry-point (uvicorn) ─────────────
+if __name__ == "__main__":          # pragma: no cover
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
+        reload_includes=["*.py"],
+    )
