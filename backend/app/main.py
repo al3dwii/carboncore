@@ -25,6 +25,9 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from app.middleware.secure_headers import SecureHeadersMiddleware
 import structlog
 
+# ← Replace SecureHeadersMiddleware import with SecureHeaders
+from secure import SecureHeaders
+
 from .core.deps import init_db, engine
 from .core.logging import init_logging
 from .core.otel import init_otel
@@ -48,7 +51,8 @@ async def lifespan(_: FastAPI):
 # ──────────────── middleware list ──────────────────────────────
 MIDDLEWARE: Final = []
 if getattr(settings, "SECURE_HEADERS", True):
-    MIDDLEWARE.append({"middleware_class": SecureHeadersMiddleware})
+    # Use `SecureHeaders` directly (it acts as ASGI middleware)
+    MIDDLEWARE.append({"middleware_class": SecureHeaders})
 
 # ──────────────── FastAPI factory ──────────────────────────────
 app = FastAPI(

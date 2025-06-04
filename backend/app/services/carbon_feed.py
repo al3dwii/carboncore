@@ -20,7 +20,7 @@ from abc import ABC, abstractmethod
 from typing import Callable, Final
 
 import httpx
-import redis.asyncio as redis  # redis-py ≥4.x (aioredis shim)
+import redis.asyncio as redis
 import structlog
 from prometheus_client import Counter, Histogram
 from tenacity import RetryError, retry, stop_after_attempt, wait_exponential
@@ -47,7 +47,7 @@ _FETCH_TOTAL = Counter(
 )
 
 # ───────────────────────── Redis cache ─────────────────────────
-_REDIS: Final = redis.from_url(settings.redis_url, decode_responses=True)
+_REDIS: Final = redis.from_url(settings.REDIS_URL, decode_responses=True)
 _CACHE_TTL = 300  # seconds
 
 
@@ -68,8 +68,8 @@ class BaseAdapter(ABC):
     @abstractmethod
     async def intensity(self, zone: str) -> float: ...
 
-    # shared Prometheus wrapper
     async def _observe(self, zone: str, fn: Callable[[str], float]) -> float:
+        """Prometheus latency wrapper."""
         with _FEED_LAT.labels(self.name, zone).time():
             try:
                 val = await fn(zone)
@@ -88,7 +88,7 @@ class ElectricityMapsAdapter(BaseAdapter):
 
     def __init__(self) -> None:
         self._client = httpx.AsyncClient(
-            headers={"auth-token": settings.electricitymaps_api_key or ""},
+            headers={"auth-token": settings.ELECTRICITYMAPS_API_KEY or ""},
             timeout=self.timeout,
         )
 
@@ -106,7 +106,7 @@ class ElectricityMapsAdapter(BaseAdapter):
 class WattTimeAdapter(BaseAdapter):
     name = "watttime"
     _LOGIN = "https://api2.watttime.org/v2/login"
-    _URL = "https://api2.watttime.org/v2/index?ba={zone}"
+    _URL   = "https://api2.watttime.org/v2/index?ba={zone}"
 
     def __init__(self) -> None:
         self._client = httpx.AsyncClient(timeout=self.timeout)
@@ -118,8 +118,8 @@ class WattTimeAdapter(BaseAdapter):
         r = await self._client.post(
             self._LOGIN,
             json={
-                "username": settings.watttime_user,
-                "password": settings.watttime_pass,
+                "username": settings.WATTTIME_USER,
+                "password": settings.WATTTIME_PASS,
             },
         )
         r.raise_for_status()
@@ -139,20 +139,19 @@ class WattTimeAdapter(BaseAdapter):
         return await self._observe(zone, self._call)
 
 
-# ─────────── Adapter registry (keep singletons alive) ──────────
-_PRIMARY = ElectricityMapsAdapter()
+# ─────────── Adapter registry (singletons) ─────────────────────
+_PRIMARY   = ElectricityMapsAdapter()
 _SECONDARY = WattTimeAdapter()
 _PROVIDERS: Final[list[BaseAdapter]] = [_PRIMARY, _SECONDARY]
 
 # ───────────────────── Public API function ─────────────────────
 async def fetch_intensity(zone: str) -> float:  # noqa: D401
     """
-    Return gCO₂/kWh for *zone* with caching, retries, and provider fallback.
+    Return gCO₂/kWh for *zone* with caching, retries and provider fallback.
     Raises RuntimeError if both providers ultimately fail.
     """
     zone = zone.upper()
 
-    # Redis L2 cache
     if (cached := await _cache_get(zone)) is not None:
         log.debug("carbon.cache.hit", zone=zone, value=cached)
         return cached
@@ -175,8 +174,9 @@ async def fetch_intensity(zone: str) -> float:  # noqa: D401
     raise RuntimeError(" ; ".join(errors))
 
 
-# legacy alias
+# Legacy alias
 get_intensity = fetch_intensity
+
 
 # ───────────────────── CLI quick-check ─────────────────────────
 if __name__ == "__main__":  # pragma: no cover
