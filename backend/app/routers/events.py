@@ -29,6 +29,7 @@ from fastapi import (
     Request,
     status,
 )
+from typing import Annotated
 from fastapi_pagination import Page, Params, paginate
 from prometheus_client import Counter, Histogram
 from sqlmodel import select
@@ -110,8 +111,8 @@ async def create_event(
 @router.post("/batch", status_code=status.HTTP_202_ACCEPTED)
 @limiter.limit("60/minute")
 async def batch_events(
-    payload: List[SavingEvent] = Body(..., description="≤ 5 000 SavingEvent objects"),
     request: Request,  # noqa: D401
+    payload: List[SavingEvent] = Body(..., description="≤ 5 000 SavingEvent objects"),
     db: AsyncSession = Depends(get_db),
     _: ProjectToken = Depends(verify_project_token),
 ):
@@ -147,7 +148,7 @@ async def batch_events(
 @limiter.limit("120/minute")
 async def list_events(
     request: Request,  # noqa: D401
-    params: Params = Depends(),
+    params: Annotated[Params, Depends()],
     project_id: UUID | None = Query(None),
     feature: str | None = Query(None),
     since: datetime | None = Query(None),

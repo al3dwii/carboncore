@@ -36,11 +36,8 @@ greenlet = "^3.2.2"
 # Caching
 redis = { extras = ["hiredis"], version = "^5.0.4" }
 
-# ❌ remove this line:
-# secure = "^0.3.0"
 
 # Security headers middleware (Starlette‐compatible)
-starlette-secureheaders = "^0.4.0"
 
 # ───────────────────────────── Observability ─────────────────────────────
 prometheus-client                    = "^0.20.0"
