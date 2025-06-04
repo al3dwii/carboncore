@@ -1,0 +1,57 @@
+name: ci
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: carboncore
+        ports: [5432:5432]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 10s
+          --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+
+      - name: Cache Poetry venv
+        uses: actions/cache@v4
+        with:
+          key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+          restore-keys: ${{ runner.os }}-poetry-
+          path: ~/.cache/pypoetry
+
+      - name: Install deps
+        run: |
+          pipx install poetry
+          poetry install --no-interaction
+
+      - name: Unit tests + ruff + mypy
+        run: |
+          cd backend
+          poetry run ruff .
+          poetry run mypy .
+          poetry run pytest -q
+
+      - name: Trivy SBOM & vuln scan
+        uses: aquasecurity/trivy-action@v0.22.0
+        with:
+          image-ref: ghcr.io/${{ github.repository }}/carboncore-backend:latest
+          format: table
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+
+      - name: Alembic head check
+        run: |
+          cd backend
+          poetry run alembic downgrade +1 >/dev/null \
+            && echo '❌ Uncommitted migration' && exit 1 \
+            || echo '✅ migrations up-to-date'
