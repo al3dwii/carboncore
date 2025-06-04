@@ -22,7 +22,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
 from prometheus_fastapi_instrumentator import Instrumentator
-from starlette.middleware.secure_headers import SecureHeadersMiddleware
+from app.middleware.secure_headers import SecureHeadersMiddleware
 import structlog
 
 from .core.deps import init_db, engine
