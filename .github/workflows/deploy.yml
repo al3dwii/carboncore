@@ -1,0 +1,25 @@
+name: fly-deploy
+on:
+  workflow_dispatch:
+    inputs:
+      color:
+        description: "blue or green"
+        type: choice
+        required: true
+        options: [blue, green]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+      - name: Deploy (blue/green)
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: |
+          COLOR=${{ inputs.color }}
+          HASH=$(git rev-parse --short HEAD)
+          IMAGE=ghcr.io/${{ github.repository }}/carboncore-backend:$HASH
+          fly deploy --image $IMAGE --config fly.${COLOR}.toml
+          fly releases promote $COLOR
