@@ -1,7 +1,12 @@
 """Async DB helpers + table bootstrap."""
 from typing import AsyncGenerator
 
-from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 from sqlmodel import SQLModel
 
 from .settings import get_settings
@@ -16,8 +21,11 @@ SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 
 # 3 FastAPI dependency ──────────────────────
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
-    async with SessionLocal() as session:
+    session = SessionLocal()
+    try:
         yield session
+    finally:
+        await session.close()
 
 
 # 4 Sprint-2 bootstrap helper ───────────────
