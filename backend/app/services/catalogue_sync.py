@@ -15,7 +15,7 @@ async def sync_skus(db: AsyncSession):
             provider="aws",
             vcpu=int(row["vCPU"]),
             ram_gb=float(row["MemoryGiB"]),
-            watts_per_vcpu=float(row["WattsPervCPU"]),
+            watts_per_vcpu=float(row["WattsPerVCPU"]),
             price_hour_usd=float(row["OnDemandUSD"]),
         )
         if sku:
