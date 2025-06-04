@@ -7,7 +7,9 @@ from sqlalchemy.ext.asyncio import (
     async_sessionmaker,
     create_async_engine,
 )
-from sqlmodel import SQLModel
+from sqlmodel import SQLModel, select
+
+from app.models import ProjectToken
 
 from .settings import get_settings
 
@@ -33,3 +35,17 @@ async def init_db() -> None:
     """Create tables if they don’t exist (idempotent)."""
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
+
+    # Seed the default "demo" token used by the tests
+    async with SessionLocal() as db:
+        existing = await db.scalar(
+            select(ProjectToken).where(ProjectToken.name == "demo")
+        )
+        if not existing:
+            db.add(
+                ProjectToken(
+                    name="demo",
+                    token_hash=ProjectToken.hash("demo"),
+                )
+            )
+            await db.commit()
