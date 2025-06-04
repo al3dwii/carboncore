@@ -12,6 +12,7 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 poetry.lock
+!backend/poetry.lock
 
 # ── Docker volumes & misc ───────────────────────────────────────────────
 docker-volume/
