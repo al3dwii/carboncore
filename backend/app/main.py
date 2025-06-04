@@ -25,9 +25,6 @@ from prometheus_fastapi_instrumentator import Instrumentator
 from app.middleware.secure_headers import SecureHeadersMiddleware
 import structlog
 
-# ← Replace SecureHeadersMiddleware import with SecureHeaders
-from secure import SecureHeaders
-
 from .core.deps import init_db, engine
 from .core.logging import init_logging
 from .core.otel import init_otel
@@ -51,13 +48,13 @@ async def lifespan(_: FastAPI):
 # ──────────────── middleware list ──────────────────────────────
 MIDDLEWARE: Final = []
 if getattr(settings, "SECURE_HEADERS", True):
-    # Use `SecureHeaders` directly (it acts as ASGI middleware)
-    MIDDLEWARE.append({"middleware_class": SecureHeaders})
+    # Apply Secure headers via custom Starlette middleware
+    MIDDLEWARE.append({"middleware_class": SecureHeadersMiddleware})
 
 # ──────────────── FastAPI factory ──────────────────────────────
 app = FastAPI(
     title="CarbonCore API",
-    version=getattr(settings, "BUILD_SHA", "0.1.0-beta.1"),
+    version=getattr(settings, "BUILD_SHA", None) or "0.1.0-beta.1",
     docs_url="/",
     redoc_url=None,
     root_path=f"/{settings.BLUE_GREEN_COLOR}" if getattr(settings, "BLUE_GREEN_COLOR", "") else "",

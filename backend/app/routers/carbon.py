@@ -22,7 +22,7 @@ from datetime import datetime
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from prometheus_client import Counter, Histogram
-from slowapi import limiter
+from ..core.ratelimit import limiter
 
 from ..services.carbon_feed import fetch_intensity
 from .tokens import verify_project_token, ProjectToken  # auth dependency

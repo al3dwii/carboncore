@@ -25,9 +25,10 @@ from fastapi import (
     Request,
     status,
 )
+from typing import Annotated
 from fastapi_pagination import Page, Params, paginate
 from prometheus_client import Counter
-from slowapi import limiter
+from ..core.ratelimit import limiter
 from sqlmodel import asc, desc, or_, select
 from sqlmodel.ext.asyncio.session import AsyncSession
 
@@ -58,7 +59,7 @@ def _order_clause(col: str, direction: str):
 @limiter.limit("120/minute")
 async def list_skus(
     request: Request,                         # noqa: D401
-    params: Params = Depends(),
+    params: Annotated[Params, Depends()],
     provider: str | None = Query(None),
     q: str | None = Query(
         None,

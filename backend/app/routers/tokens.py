@@ -31,6 +31,7 @@ from fastapi import (
     Request,
     status,
 )
+from typing import Annotated
 from fastapi_pagination import Page, Params, paginate
 from passlib.hash import bcrypt
 from prometheus_client import Counter
@@ -103,7 +104,7 @@ async def create_token(
 @limiter.limit("60/minute")
 async def list_tokens(
     request: Request,                     # noqa: D401
-    params: Params = Depends(),
+    params: Annotated[Params, Depends()],
     db: AsyncSession = Depends(get_db),
     _: ProjectToken = Depends(verify_project_token),
 ):
