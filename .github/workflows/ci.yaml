@@ -45,7 +45,7 @@ jobs:
           poetry run pytest -q
 
       - name: Trivy SBOM & vuln scan
-        uses: aquasecurity/trivy-action@v0.22.0
+        uses: aquasecurity/trivy-action@0.22.0
         with:
           image-ref: ghcr.io/${{ github.repository }}/carboncore-backend:latest
           format: table
