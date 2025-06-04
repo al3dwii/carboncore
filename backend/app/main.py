@@ -17,15 +17,17 @@ from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import Final
 
+import structlog
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
 from prometheus_fastapi_instrumentator import Instrumentator
-from app.middleware.secure_headers import SecureHeadersMiddleware
-import structlog
+from starlette.middleware import Middleware
 
-from .core.deps import init_db, engine
+from app.middleware.secure_headers import SecureHeadersMiddleware
+
+from .core.deps import engine, init_db
 from .core.logging import init_logging
 from .core.otel import init_otel
 from .core.ratelimit import attach as attach_rate_limit
@@ -49,7 +51,7 @@ async def lifespan(_: FastAPI):
 MIDDLEWARE: Final = []
 if getattr(settings, "SECURE_HEADERS", True):
     # Apply Secure headers via custom Starlette middleware
-    MIDDLEWARE.append({"middleware_class": SecureHeadersMiddleware})
+    MIDDLEWARE.append(Middleware(SecureHeadersMiddleware))
 
 # ──────────────── FastAPI factory ──────────────────────────────
 app = FastAPI(
@@ -110,6 +112,8 @@ if getattr(settings, "ENABLE_TRACING", True):
         log.info("otel.enabled")
     except ImportError:             # pragma: no cover
         log.warning("otel.not_installed")
+    except NotImplementedError:     # pragma: no cover
+        log.warning("otel.unsupported_engine")
 
 log.info("app.initialised")
 

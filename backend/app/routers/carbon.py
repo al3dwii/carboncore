@@ -22,10 +22,10 @@ from datetime import datetime
 import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from prometheus_client import Counter, Histogram
-from ..core.ratelimit import limiter
 
+from ..core.ratelimit import limiter
 from ..services.carbon_feed import fetch_intensity
-from .tokens import verify_project_token, ProjectToken  # auth dependency
+from .tokens import ProjectToken, verify_project_token  # auth dependency
 
 router = APIRouter(prefix="/carbon", tags=["carbon"])
 log = structlog.get_logger()
@@ -42,6 +42,7 @@ CARBON_REQ_LAT = Histogram(
 
 
 @router.get("/", summary="Live CO₂ intensity (gCO₂/kWh)")
+@router.get("")
 @limiter.limit("30/second")
 async def carbon_intensity(  # noqa: D401
     request: Request,

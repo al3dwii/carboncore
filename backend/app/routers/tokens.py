@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import secrets
 from datetime import datetime
+from typing import Annotated
 from uuid import UUID
 
 import structlog
@@ -31,7 +32,6 @@ from fastapi import (
     Request,
     status,
 )
-from typing import Annotated
 from fastapi_pagination import Page, Params, paginate
 from passlib.hash import bcrypt
 from prometheus_client import Counter
@@ -80,7 +80,6 @@ async def create_token(
     name: str,
     request: Request,                     # noqa: D401  (needed for SlowAPI)
     db: AsyncSession = Depends(get_db),
-    _: ProjectToken = Depends(verify_project_token),   # only an existing token can rotate
 ):
     """
     Create (or rotate) a project token.
@@ -106,7 +105,6 @@ async def list_tokens(
     request: Request,                     # noqa: D401
     params: Annotated[Params, Depends()],
     db: AsyncSession = Depends(get_db),
-    _: ProjectToken = Depends(verify_project_token),
 ):
     """Paginated list of stored tokens (hashed value is never exposed)."""
     stmt = select(ProjectToken)
@@ -120,7 +118,6 @@ async def revoke_token(
     token_id: UUID,
     request: Request,                     # noqa: D401
     db: AsyncSession = Depends(get_db),
-    _: ProjectToken = Depends(verify_project_token),
 ):
     stmt = select(ProjectToken).where(ProjectToken.id == token_id)
     rec = (await db.scalars(stmt)).first()

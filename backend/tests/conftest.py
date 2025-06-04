@@ -6,6 +6,8 @@ contains the `app` package) is on `sys.path` no matter where the tests
 are executed from (CI, IDE, or manually).
 """
 
+# ruff: noqa
+
 from __future__ import annotations
 
 # ─── make `app` importable ─────────────────────────────────────────
@@ -17,13 +19,20 @@ if str(BACKEND_DIR) not in sys.path:
     sys.path.insert(0, str(BACKEND_DIR))
 # ───────────────────────────────────────────────────────────────────
 
+import os
+
 import pytest_asyncio
 from httpx import AsyncClient
-from app.main import app
+
+os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///:memory:")  # noqa: E402
+
+from app.main import app  # noqa: E402
+from app.core.deps import init_db
 
 
 @pytest_asyncio.fixture
 async def client():
     """Reusable async HTTP client bound to the FastAPI app."""
+    await init_db()
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
