@@ -9,7 +9,7 @@ from .settings import get_settings
 settings = get_settings()
 
 # 1 engine ──────────────────────────────────
-engine: AsyncEngine = create_async_engine(settings.database_url, echo=False, future=True)
+engine: AsyncEngine = create_async_engine(settings.DATABASE_URL, echo=False, future=True)
 
 # 2 session factory ─────────────────────────
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
