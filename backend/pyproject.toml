@@ -36,7 +36,7 @@ greenlet = "^3.2.2"
 # Caching
 redis = { extras = ["hiredis"], version = "^5.0.4" }
 
-aiosqlite = "^0.20.0"
+aiosqlite = "^0.20"
 
 # Logging
 structlog = "^25.4.0"
