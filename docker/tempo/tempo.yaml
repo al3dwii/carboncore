@@ -1,0 +1,17 @@
+server:
+  http_listen_port: 3200          # Grafana UI & status (optional)
+
+distributor:
+  receivers:
+    otlp:                         # what OpenTelemetry SDKs talk to
+      protocols:
+        http:
+          endpoint: 0.0.0.0:4318
+        grpc:
+          endpoint: 0.0.0.0:4317
+
+storage:
+  trace:
+    backend: local
+    local:
+      path: /tmp/tempo             # inside the container

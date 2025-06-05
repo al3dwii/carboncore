@@ -21,6 +21,11 @@ if str(BACKEND_DIR) not in sys.path:
 
 import os
 
+os.environ.setdefault(
+    "DATABASE_URL",
+    "sqlite+aiosqlite:///./test.db"   # isolate tests from the live Postgres
+)
+
 # Use fakeredis for unit tests and silence OTEL exporter noise
 os.environ.setdefault("REDIS_URL", "fakeredis://")
 os.environ.setdefault("OTEL_TRACES_EXPORTER", "none")

@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   db:
     image: postgres:16
@@ -8,6 +6,16 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports: ["5432:5432"]
+
+  # 👇 move tempo here (same indent as db / redis / backend / celery)
+  tempo:
+    image: grafana/tempo:2.7.2  
+    command: [ "-config.file=/etc/tempo.yaml" ]       
+    volumes:
+      - ./docker/tempo/tempo.yaml:/etc/tempo.yaml:ro
+    ports:
+      - "4318:4318"     # OTLP HTTP
+      - "4317:4317"     # OTLP gRPC (optional)
 
   redis:
     image: redis:7
@@ -22,8 +30,9 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/carboncore
       REDIS_URL: redis://redis:6379/0
-      OTEL_TRACES_EXPORTER: none
-    depends_on: [db, redis]
+      OTEL_TRACES_EXPORTER: none        # or OTEL_SDK_DISABLED=true if you’d rather silence tracing
+      FAKE_CARBON_FEED: 1
+    depends_on: [db, redis, tempo]      # backend now waits for tempo too
     ports: ["8000:8000"]
 
   celery:
@@ -37,4 +46,4 @@ services:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/carboncore
       REDIS_URL: redis://redis:6379/0
       OTEL_TRACES_EXPORTER: none
-    depends_on: [backend, redis]
+    depends_on: [backend, redis, tempo]
