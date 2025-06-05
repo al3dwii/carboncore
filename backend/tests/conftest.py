@@ -21,6 +21,11 @@ if str(BACKEND_DIR) not in sys.path:
 
 import os
 
+# Use fakeredis for unit tests and silence OTEL exporter noise
+os.environ.setdefault("REDIS_URL", "fakeredis://")
+os.environ.setdefault("OTEL_TRACES_EXPORTER", "none")
+os.environ.setdefault("ENABLE_TRACING", "false")
+
 # Force all tests to run under asyncio
 os.environ.setdefault("ANYIO_BACKEND", "asyncio")
 
@@ -32,6 +37,14 @@ os.environ.setdefault("DATABASE_URL", "sqlite+aiosqlite:///:memory:")  # noqa: E
 
 from app.main import app  # noqa: E402
 from app.core.deps import init_db
+from app.services import carbon_feed
+from app.routers import carbon as carbon_router
+from unittest.mock import AsyncMock
+
+fake_fetch = AsyncMock(return_value=123.4)
+carbon_feed.fetch_intensity = fake_fetch
+carbon_router.fetch_intensity = fake_fetch
+carbon_router.carbon_intensity = carbon_router.limiter.limit("30/minute")(carbon_router.carbon_intensity)
 
 
 @pytest_asyncio.fixture
