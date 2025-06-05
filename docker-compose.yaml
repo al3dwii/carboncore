@@ -22,6 +22,7 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/carboncore
       REDIS_URL: redis://redis:6379/0
+      OTEL_TRACES_EXPORTER: none
     depends_on: [db, redis]
     ports: ["8000:8000"]
 
@@ -35,4 +36,5 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/carboncore
       REDIS_URL: redis://redis:6379/0
+      OTEL_TRACES_EXPORTER: none
     depends_on: [backend, redis]
