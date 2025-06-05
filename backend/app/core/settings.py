@@ -22,6 +22,11 @@ class Settings(BaseSettings):
         "postgresql+asyncpg://postgres:postgres@db:5432/carboncore"
     )
     REDIS_URL: str = "redis://redis:6379/0"
+
+    @property
+    def redis_url(self) -> str:  # noqa: N802
+        """Alias for Celery configuration."""
+        return self.REDIS_URL
     OTEL_EXPORTER_OTLP_ENDPOINT: str | None = None       # e.g. http://tempo:4318
     LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
     RATE_LIMIT: str = "30/second"                        # global slowapi default
