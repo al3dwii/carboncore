@@ -27,6 +27,12 @@ from tenacity import RetryError, retry, stop_after_attempt, wait_exponential
 
 from app.core.settings import settings
 
+if settings.REDIS_URL.startswith("fakeredis://"):
+    import fakeredis.aioredis
+    _REDIS: Final = fakeredis.aioredis.FakeRedis(decode_responses=True)
+else:
+    _REDIS: Final = redis.from_url(settings.REDIS_URL, decode_responses=True)
+
 # ───────────────────────── Observability ───────────────────────
 log = structlog.get_logger()
 
@@ -47,7 +53,6 @@ _FETCH_TOTAL = Counter(
 )
 
 # ───────────────────────── Redis cache ─────────────────────────
-_REDIS: Final = redis.from_url(settings.REDIS_URL, decode_responses=True)
 _CACHE_TTL = 300  # seconds
 
 
