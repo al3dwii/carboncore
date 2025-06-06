@@ -1,39 +1,59 @@
+#############################################################
+# docker-compose.yml – CarbonCore full stack
+# (Postgres, Redis, Tempo, FastAPI backend, Celery, React UI)
+#############################################################
+
 services:
+  # ───────────── data plane ─────────────
   db:
     image: postgres:16
     environment:
       POSTGRES_DB: carboncore
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-    ports: ["5432:5432"]
-
-  # 👇 move tempo here (same indent as db / redis / backend / celery)
-  tempo:
-    image: grafana/tempo:2.7.2  
-    command: [ "-config.file=/etc/tempo.yaml" ]       
-    volumes:
-      - ./docker/tempo/tempo.yaml:/etc/tempo.yaml:ro
     ports:
-      - "4318:4318"     # OTLP HTTP
-      - "4317:4317"     # OTLP gRPC (optional)
+      - "5432:5432"
 
   redis:
     image: redis:7
-    ports: ["6379:6379"]
+    ports:
+      - "6379:6379"
 
+  tempo:                # OpenTelemetry trace collector
+    image: grafana/tempo:2.7.2
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./docker/tempo/tempo.yaml:/etc/tempo.yaml:ro
+    ports:
+      - "4318:4318"      # OTLP HTTP
+      - "4317:4317"      # OTLP gRPC (optional)
+
+  # ───────────── compute plane ──────────
   backend:
     build:
       context: .
       dockerfile: backend/Dockerfile
     volumes:
-      - ./backend:/code
+      - ./backend:/code                  # live-reload during dev
+    env_file:
+      - .env.development                 # user-editable defaults
     environment:
+      # core connectivity
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/carboncore
       REDIS_URL: redis://redis:6379/0
-      OTEL_TRACES_EXPORTER: none        # or OTEL_SDK_DISABLED=true if you’d rather silence tracing
-      FAKE_CARBON_FEED: 1
-    depends_on: [db, redis, tempo]      # backend now waits for tempo too
-    ports: ["8000:8000"]
+      # live carbon providers
+      ELECTRICITYMAPS_TOKEN: "Z5NJGQ28hQq28m4NLsvu"
+      ELECTRICITYMAPS_API_KEY: "Z5NJGQ28hQq28m4NLsvu"
+      WATTTIME_USERNAME: "carboncore"
+      WATTTIME_PASSWORD: "Carboncore123!"
+      # observability (disable traces locally)
+      OTEL_TRACES_EXPORTER: none
+    depends_on:
+      - db
+      - redis
+      - tempo
+    ports:
+      - "8000:8000"
 
   celery:
     build:
@@ -42,8 +62,30 @@ services:
     command: celery -A app.tasks.worker worker -B --loglevel=info
     volumes:
       - ./backend:/code
+    env_file:
+      - .env.development
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/carboncore
       REDIS_URL: redis://redis:6379/0
+      ELECTRICITYMAPS_TOKEN: "Z5NJGQ28hQq28m4NLsvu"
+      ELECTRICITYMAPS_API_KEY: "Z5NJGQ28hQq28m4NLsvu"
+      WATTTIME_USERNAME: "carboncore"
+      WATTTIME_PASSWORD: "Carboncore123!"
       OTEL_TRACES_EXPORTER: none
-    depends_on: [backend, redis, tempo]
+    depends_on:
+      - backend
+      - redis
+      - tempo
+
+  # ─────────── optional front-end ───────────
+  # web:
+  #   build:
+  #     context: .
+  #     dockerfile: web/Dockerfile
+  #   command: pnpm dev --port 3000
+  #   volumes:
+  #     - ./web:/app
+  #   depends_on:
+  #     - backend
+  #   ports:
+  #     - "3000:3000"
