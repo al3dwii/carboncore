@@ -7,19 +7,19 @@ Project-token CRUD and authentication dependency.
 
 Endpoints
 ─────────
-POST   /tokens/           → create / rotate (returns clear-text token **once**)
-GET    /tokens/           → paginated list (hashed value never exposed)
-DELETE /tokens/{id}       → revoke
+POST   /tokens/            → create / rotate (returns clear-text token **once**)
+GET    /tokens/            → paginated list (hashed value never exposed)
+DELETE /tokens/{id}        → revoke
 
 Dependency
 ──────────
-verify_project_token() → returns ProjectToken record or HTTP 401.
+verify_project_token() → returns ProjectToken record or HTTP 401
 """
 
 from __future__ import annotations
 
 import secrets
-from datetime import datetime
+from datetime import datetime, UTC
 from typing import Annotated
 from uuid import UUID
 
@@ -73,12 +73,13 @@ async def verify_project_token(
     log.warning("auth.token.invalid")
     raise HTTPException(status_code=401, detail="invalid token")
 
+
 # ────────── CRUD endpoints ──────────
+@limiter.limit("30/minute")                     # ← *outermost* for SlowAPI
 @router.post("/", status_code=status.HTTP_201_CREATED)
-@limiter.limit("30/minute")
 async def create_token(
     name: str,
-    request: Request,                     # noqa: D401  (needed for SlowAPI)
+    request: Request,                           # noqa: D401  (SlowAPI needs it)
     db: AsyncSession = Depends(get_db),
 ):
     """
@@ -90,7 +91,7 @@ async def create_token(
     record = ProjectToken(
         name=name,
         token_hash=bcrypt.hash(raw),
-        created_at=datetime.utcnow(),
+        created_at=datetime.now(UTC),
     )
     db.add(record)
     await db.commit()
@@ -99,10 +100,10 @@ async def create_token(
     return {"id": record.id, "token": raw, "created_at": record.created_at}
 
 
-@router.get("/", response_model=Page[ProjectToken])
 @limiter.limit("60/minute")
+@router.get("/", response_model=Page[ProjectToken])
 async def list_tokens(
-    request: Request,                     # noqa: D401
+    request: Request,                           # noqa: D401
     params: Annotated[Params, Depends()],
     db: AsyncSession = Depends(get_db),
 ):
@@ -112,11 +113,11 @@ async def list_tokens(
     return paginate(records, params)
 
 
-# Also serve /tokens without the trailing slash
-@router.get("", response_model=list[ProjectToken])
+# Also serve `/tokens` without the trailing slash
 @limiter.limit("60/minute")
+@router.get("", response_model=list[ProjectToken], include_in_schema=False)
 async def list_tokens_no_slash(
-    request: Request,
+    request: Request,                           # noqa: D401
     db: AsyncSession = Depends(get_db),
 ):
     stmt = select(ProjectToken)
@@ -124,11 +125,11 @@ async def list_tokens_no_slash(
     return records
 
 
-@router.delete("/{token_id}", status_code=status.HTTP_204_NO_CONTENT)
 @limiter.limit("30/minute")
+@router.delete("/{token_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def revoke_token(
     token_id: str,
-    request: Request,                     # noqa: D401
+    request: Request,                           # noqa: D401
     db: AsyncSession = Depends(get_db),
 ):
     tid = UUID(token_id)

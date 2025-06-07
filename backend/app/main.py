@@ -1,22 +1,22 @@
 """
-CarbonCore FastAPI entry-point (v0.1.0-beta).
-
-Highlights
-──────────
+CarbonCore FastAPI entry-point  (v0.1.0-beta)
+─────────────────────────────────────────────
 • Secure Headers, CORS and global SlowAPI rate-limiting
 • JSON logs via `core.logging.init_logging`
-• OTEL traces (FastAPI + httpx + SQLAlchemy) via `core.otel.init_otel`
+• OTEL traces (FastAPI + httpx + SQLAlchemy)
 • Prometheus /metrics (compressed) via Instrumentator
 • Pagination wired globally (`fastapi_pagination`)
-• Health/ready probes & blue/green root-path support
+• Health / ready probes & blue-green root-path support
 """
 
-from __future__ import annotations
+from __future__ import annotations          # ← PEP-236: must follow the docstring
 
+# ───────────── stdlib / typing ─────────────
 from contextlib import asynccontextmanager
 from datetime import datetime
 from typing import Final
 
+# ─────────────── 3rd-party ────────────────
 import structlog
 import uvicorn
 from fastapi import FastAPI, Request
@@ -25,8 +25,12 @@ from fastapi_pagination import add_pagination
 from prometheus_fastapi_instrumentator import Instrumentator
 from starlette.middleware import Middleware
 
-from app.middleware.secure_headers import SecureHeadersMiddleware
+from fastapi import FastAPI, Request, Response   # ← add Response here
 
+from datetime import UTC, datetime
+
+# ─────────────── internal ────────────────
+from app.middleware.secure_headers import SecureHeadersMiddleware
 from .core.deps import engine, init_db
 from .core.logging import init_logging
 from .core.otel import init_otel
@@ -34,11 +38,11 @@ from .core.ratelimit import attach as attach_rate_limit, limiter
 from .core.settings import settings
 from .routers import carbon, events, skus, tokens
 
-# ──────────────── logging bootstrap ────────────────────────────
-init_logging()                      # JSON logs straight to STDOUT
+# ────────────── logging bootstrap ──────────
+init_logging()                               # JSON logs → STDOUT
 log = structlog.get_logger()
 
-# ──────────────── lifespan hook ────────────────────────────────
+# ───────────── lifespan handler ────────────
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     log.info("lifespan.start", env=getattr(settings, "ENV", "dev"))
@@ -46,16 +50,13 @@ async def lifespan(_: FastAPI):
     yield
     log.info("lifespan.stop")
 
-
-# ──────────────── middleware list ──────────────────────────────
-MIDDLEWARE: Final = []
+# ───────────── middleware list ─────────────
+MIDDLEWARE: Final[list[Middleware]] = []
 if getattr(settings, "SECURE_HEADERS", True):
-    # Apply Secure headers via custom Starlette middleware
     MIDDLEWARE.append(Middleware(SecureHeadersMiddleware))
 
-# ──────────────── FastAPI factory ──────────────────────────────
+# ───────────── FastAPI factory ─────────────
 app = FastAPI(
-    title="CarbonCore API",
     version=getattr(settings, "BUILD_SHA", None) or "0.1.0-beta.1",
     docs_url="/",
     redoc_url=None,
@@ -63,10 +64,11 @@ app = FastAPI(
     lifespan=lifespan,
     middleware=MIDDLEWARE,
 )
-from slowapi.middleware import SlowAPIMiddleware
-app.add_middleware(SlowAPIMiddleware)
 
-# CORS (wide-open for now; tighten before GA)
+# NOTE: **do NOT** add SlowAPIMiddleware manually here.
+# `core.ratelimit.attach()` installs it with the right arguments.
+
+# ───────────── CORS (wide-open) ────────────
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -75,40 +77,41 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Routers
+# ───────────── Routers ─────────────────────
 for router in (skus.router, tokens.router, events.router, carbon.router):
     app.include_router(router)
 
-# Global helpers
-attach_rate_limit(app)
+# ───────────── Helpers / pagination / RL ───
+attach_rate_limit(app)                       # installs SlowAPIMiddleware
 add_pagination(app)
 
-# Health / readiness probes
+@limiter.limit("1/second")            # ← outer-most so SlowAPI sees it first
 @app.get("/healthz", include_in_schema=False)
-@limiter.limit("5/second")
-async def healthz(request: Request) -> dict[str, str]:
-    return {"status": "ok", "ts": datetime.utcnow().isoformat()}
+async def healthz(request: Request, response: Response) -> dict[str, str]:
+    """Liveness probe (rate-limited)."""
+    return {
+        "status": "ok",
+        "ts": datetime.now(UTC).isoformat(timespec="seconds"),
+    }
 
 
 @app.get("/readyz", include_in_schema=False)
 async def readyz() -> dict[str, str]:
+    """Readiness probe (no rate-limit)."""
     return {
         "status": "ready",
         "instance": getattr(settings, "INSTANCE_ID", "local"),
         "color": getattr(settings, "BLUE_GREEN_COLOR", "default"),
     }
 
-# ──────────────── Prometheus metrics ───────────────────────────
+# ───────────── Prometheus ───────────────────
 if getattr(settings, "ENABLE_METRICS", True):
     Instrumentator().instrument(app).expose(
-        app,
-        endpoint="/metrics",
-        include_in_schema=False,
-        should_gzip=True,
+        app, endpoint="/metrics", include_in_schema=False, should_gzip=True
     )
     log.info("prometheus.enabled")
 
-# ──────────────── OpenTelemetry traces ─────────────────────────
+# ───────────── OpenTelemetry ────────────────
 if getattr(settings, "ENABLE_TRACING", True):
     try:
         init_otel(app, engine)
@@ -120,8 +123,8 @@ if getattr(settings, "ENABLE_TRACING", True):
 
 log.info("app.initialised")
 
-# ─────────── local developer entry-point (uvicorn) ─────────────
-if __name__ == "__main__":          # pragma: no cover
+# ───────────── Local dev runner ─────────────
+if __name__ == "__main__":                    # pragma: no cover
     uvicorn.run(
         "app.main:app",
         host="0.0.0.0",
