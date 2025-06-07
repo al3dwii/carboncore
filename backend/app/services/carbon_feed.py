@@ -15,6 +15,8 @@ import asyncio
 from abc import ABC, abstractmethod
 from typing import Callable, Final
 import os
+import importlib
+import sys
 
 import httpx
 import redis.asyncio as redis
@@ -153,6 +155,10 @@ class WattTimeAdapter(BaseAdapter):
 
 # ───────────────────── Provider registry & API ──────────────────────────
 TOKEN = os.getenv("ELECTRICITYMAPS_TOKEN")
+if TOKEN in (None, "", "dummy-token"):
+    sys.modules[__name__].fetch_intensity = importlib.import_module(
+        "app.services._test_stub"
+    ).fetch_intensity
 
 # ------------------------------------------------------------
 # In CI or when TOKEN is a dummy value we don't want to hit the
