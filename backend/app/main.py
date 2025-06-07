@@ -83,7 +83,7 @@ add_pagination(app)
 
 # Health / readiness probes
 @app.get("/healthz", include_in_schema=False)
-@limiter.limit("20/second")
+@limiter.limit("5/second")
 async def healthz(request: Request) -> dict[str, str]:
     return {"status": "ok", "ts": datetime.utcnow().isoformat()}
 
