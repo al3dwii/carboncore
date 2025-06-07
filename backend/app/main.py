@@ -19,7 +19,7 @@ from typing import Final
 
 import structlog
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi_pagination import add_pagination
 from prometheus_fastapi_instrumentator import Instrumentator
@@ -30,7 +30,7 @@ from app.middleware.secure_headers import SecureHeadersMiddleware
 from .core.deps import engine, init_db
 from .core.logging import init_logging
 from .core.otel import init_otel
-from .core.ratelimit import attach as attach_rate_limit
+from .core.ratelimit import attach as attach_rate_limit, limiter
 from .core.settings import settings
 from .routers import carbon, events, skus, tokens
 
@@ -83,7 +83,8 @@ add_pagination(app)
 
 # Health / readiness probes
 @app.get("/healthz", include_in_schema=False)
-async def healthz() -> dict[str, str]:
+@limiter.limit("20/second")
+async def healthz(request: Request) -> dict[str, str]:
     return {"status": "ok", "ts": datetime.utcnow().isoformat()}
 
 
