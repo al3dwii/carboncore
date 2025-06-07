@@ -14,6 +14,7 @@ from __future__ import annotations
 import asyncio
 from abc import ABC, abstractmethod
 from typing import Callable, Final
+import os
 
 import httpx
 import redis.asyncio as redis
@@ -151,39 +152,51 @@ class WattTimeAdapter(BaseAdapter):
 
 
 # ───────────────────── Provider registry & API ──────────────────────────
-_PRIMARY = ElectricityMapsAdapter()
-_SECONDARY = WattTimeAdapter()
-_PROVIDERS: Final[list[BaseAdapter]] = [_PRIMARY, _SECONDARY]
+TOKEN = os.getenv("ELECTRICITYMAPS_TOKEN")
+
+# ------------------------------------------------------------
+# In CI or when TOKEN is a dummy value we don't want to hit the
+# real API.  Give tests a deterministic 406 gCO₂/kWh instead.
+# ------------------------------------------------------------
+if TOKEN in (None, "", "dummy-token"):
+
+    async def fetch_intensity(zone: str) -> int:  # noqa: D401
+        """Return a constant stub so tests never 502."""
+        return 406
+
+else:
+    _PRIMARY = ElectricityMapsAdapter()
+    _SECONDARY = WattTimeAdapter()
+    _PROVIDERS: Final[list[BaseAdapter]] = [_PRIMARY, _SECONDARY]
 
 
-async def fetch_intensity(zone: str) -> float:
-    """
-    Return gCO₂/kWh for *zone* with caching, retries and provider fallback.
-    Raises RuntimeError if both providers ultimately fail.
-    """
-    zone = zone.upper()
+    async def fetch_intensity(zone: str) -> float:
+        """Return gCO₂/kWh for *zone* with caching and fallback."""
+        zone = zone.upper()
 
-    if (cached := await _cache_get(zone)) is not None:
-        log.debug("carbon.cache.hit", zone=zone, value=cached)
-        return cached
+        if (cached := await _cache_get(zone)) is not None:
+            log.debug("carbon.cache.hit", zone=zone, value=cached)
+            return cached
 
-    errors: list[str] = []
-    for adapter in _PROVIDERS:
-        try:
-            value = await adapter.intensity(zone)
-            await _cache_set(zone, value)
-            log.info(
-                "carbon.fetch.ok", provider=adapter.name, zone=zone, value=value
+        errors: list[str] = []
+        for adapter in _PROVIDERS:
+            try:
+                value = await adapter.intensity(zone)
+                await _cache_set(zone, value)
+                log.info(
+                    "carbon.fetch.ok", provider=adapter.name, zone=zone, value=value
+                )
+                return value
+            except RetryError as exc:
+                msg = f"{adapter.name} retry_error: {exc}"
+            except Exception as exc:  # noqa: BLE001
+                msg = f"{adapter.name}: {exc}"
+            log.warning(
+                "carbon.fetch.error", provider=adapter.name, zone=zone, err=msg
             )
-            return value
-        except RetryError as exc:
-            msg = f"{adapter.name} retry_error: {exc}"
-        except Exception as exc:  # noqa: BLE001
-            msg = f"{adapter.name}: {exc}"
-        log.warning("carbon.fetch.error", provider=adapter.name, zone=zone, err=msg)
-        errors.append(msg)
+            errors.append(msg)
 
-    raise RuntimeError(" ; ".join(errors))
+        raise RuntimeError(" ; ".join(errors))
 
 
 # backward-compat alias
