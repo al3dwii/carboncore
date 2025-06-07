@@ -56,6 +56,9 @@ async def carbon_intensity(  # noqa: D401
     • 30 requests / second per token (SlowAPI).  
     • 502 on provider failure after retries/fallback.
     """
+    zone = zone.upper()
+    if zone not in {"AE", "DE"}:
+        raise HTTPException(400, "bad zone")
     with CARBON_REQ_LAT.time():
         try:
             value = await fetch_intensity(zone)

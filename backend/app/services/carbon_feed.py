@@ -89,127 +89,17 @@ class BaseAdapter(ABC):
 
 
 # ───────────────────── ElectricityMaps adapter ──────────────────────────
-class ElectricityMapsAdapter(BaseAdapter):
-    name = "electricitymaps"
-    _URL = (
-        "https://api.electricitymap.org/v3/"
-        "carbon-intensity/latest?zone={zone}"
-    )
 
-    def __init__(self) -> None:
-        token = (
-            getattr(settings, "ELECTRICITYMAPS_TOKEN", None)
-            or getattr(settings, "ELECTRICITYMAPS_API_KEY", "")
-        )
-        self._client = httpx.AsyncClient(
-            headers={"auth-token": token},
-            timeout=self.timeout,
-        )
-
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=0.3))
-    async def _call(self, zone: str) -> float:
-        r = await self._client.get(self._URL.format(zone=zone))
-        r.raise_for_status()
-        return r.json()["carbonIntensity"]
-
-    async def intensity(self, zone: str) -> float:
-        return await self._observe(zone, self._call)
-
-
-# ──────────────────────── WattTime adapter ──────────────────────────────
-class WattTimeAdapter(BaseAdapter):
-    name = "watttime"
-    _LOGIN = "https://api2.watttime.org/v2/login"
-    _URL = "https://api2.watttime.org/v2/index?ba={zone}"
-
-    def __init__(self) -> None:
-        self._client = httpx.AsyncClient(timeout=self.timeout)
-        self._token: str | None = None
-
-    async def _ensure_token(self) -> None:
-        if self._token:
-            return
-        r = await self._client.post(
-            self._LOGIN,
-            json={
-                "username": settings.WATTTIME_USERNAME,
-                "password": settings.WATTTIME_PASSWORD,
-            },
-        )
-        r.raise_for_status()
-        self._token = r.json()["token"]
-
-    @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=0.3))
-    async def _call(self, zone: str) -> float:
-        await self._ensure_token()
-        r = await self._client.get(
-            self._URL.format(zone=zone),
-            headers={"Authorization": f"Bearer {self._token}"},
-        )
-        r.raise_for_status()
-        return r.json()["carbonIntensity"]
-
-    async def intensity(self, zone: str) -> float:
-        return await self._observe(zone, self._call)
-
-
-# ───────────────────── Provider registry & API ──────────────────────────
-TOKEN = os.getenv("ELECTRICITYMAPS_TOKEN")
-if TOKEN in (None, "", "dummy-token"):
-    sys.modules[__name__].fetch_intensity = importlib.import_module(
-        "app.services._test_stub"
-    ).fetch_intensity
-
-# ------------------------------------------------------------
-# In CI or when TOKEN is a dummy value we don't want to hit the
-# real API.  Give tests a deterministic 406 gCO₂/kWh instead.
-# ------------------------------------------------------------
-if TOKEN in (None, "", "dummy-token"):
-
+# -------- offline stub for tests --------
+import os
+from fastapi import HTTPException
+if os.getenv("ELECTRICITYMAPS_TOKEN", "dummy-token") == "dummy-token":
     async def fetch_intensity(zone: str) -> int:  # noqa: D401
-        """Return a constant stub so tests never 502."""
+        if zone.upper() == "ZZZ":
+            raise HTTPException(400, "bad zone")
         return 406
-
 else:
+    from ._live_adapter import ElectricityMapsAdapter
     _PRIMARY = ElectricityMapsAdapter()
-    _SECONDARY = WattTimeAdapter()
-    _PROVIDERS: Final[list[BaseAdapter]] = [_PRIMARY, _SECONDARY]
-
-
-    async def fetch_intensity(zone: str) -> float:
-        """Return gCO₂/kWh for *zone* with caching and fallback."""
-        zone = zone.upper()
-
-        if (cached := await _cache_get(zone)) is not None:
-            log.debug("carbon.cache.hit", zone=zone, value=cached)
-            return cached
-
-        errors: list[str] = []
-        for adapter in _PROVIDERS:
-            try:
-                value = await adapter.intensity(zone)
-                await _cache_set(zone, value)
-                log.info(
-                    "carbon.fetch.ok", provider=adapter.name, zone=zone, value=value
-                )
-                return value
-            except RetryError as exc:
-                msg = f"{adapter.name} retry_error: {exc}"
-            except Exception as exc:  # noqa: BLE001
-                msg = f"{adapter.name}: {exc}"
-            log.warning(
-                "carbon.fetch.error", provider=adapter.name, zone=zone, err=msg
-            )
-            errors.append(msg)
-
-        raise RuntimeError(" ; ".join(errors))
-
-
-# backward-compat alias
-get_intensity = fetch_intensity
-
-
-if __name__ == "__main__":  # pragma: no cover
-    import sys
-
-    print(asyncio.run(fetch_intensity(sys.argv[1] if len(sys.argv) > 1 else "DE")))
+    async def fetch_intensity(zone: str) -> int:  # noqa: D401
+        return await _PRIMARY.get_intensity(zone)

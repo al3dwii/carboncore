@@ -63,6 +63,8 @@ app = FastAPI(
     lifespan=lifespan,
     middleware=MIDDLEWARE,
 )
+from slowapi.middleware import SlowAPIMiddleware
+app.add_middleware(SlowAPIMiddleware)
 
 # CORS (wide-open for now; tighten before GA)
 app.add_middleware(
