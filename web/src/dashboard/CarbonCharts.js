@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { LineChart, Line, Tooltip, XAxis, YAxis, ResponsiveContainer } from "recharts";
 
-type Point = { ts: string; value: number };
+// type Point = { ts: string; value: number };
 
 export default function CarbonCharts() {
   const [points, setPoints] = useState<Point[]>([]);

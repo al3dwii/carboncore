@@ -42,10 +42,16 @@ services:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/carboncore
       REDIS_URL: redis://redis:6379/0
       # live carbon providers
-      ELECTRICITYMAPS_TOKEN: "Z5NJGQ28hQq28m4NLsvu"
-      ELECTRICITYMAPS_API_KEY: "Z5NJGQ28hQq28m4NLsvu"
-      WATTTIME_USERNAME: "carboncore"
-      WATTTIME_PASSWORD: "Carboncore123!"
+      # ELECTRICITYMAPS_TOKEN: "Z5NJGQ28hQq28m4NLsvu"
+      # ELECTRICITYMAPS_API_KEY: "Z5NJGQ28hQq28m4NLsvu"
+      # WATTTIME_USERNAME: "carboncore"
+      # WATTTIME_PASSWORD: "Carboncore123!"
+
+      ELECTRICITYMAPS_TOKEN:  ${ELECTRICITYMAPS_TOKEN:-dummy-token}
+      ELECTRICITYMAPS_API_KEY: ${ELECTRICITYMAPS_API_KEY:-dummy-token}   # optional, same value
+      WATTTIME_USERNAME:      ${WATTTIME_USERNAME:-dummy}
+      WATTTIME_PASSWORD:      ${WATTTIME_PASSWORD:-dummy}
+
       # observability (disable traces locally)
       OTEL_TRACES_EXPORTER: none
     depends_on:
@@ -67,10 +73,18 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/carboncore
       REDIS_URL: redis://redis:6379/0
-      ELECTRICITYMAPS_TOKEN: "Z5NJGQ28hQq28m4NLsvu"
-      ELECTRICITYMAPS_API_KEY: "Z5NJGQ28hQq28m4NLsvu"
-      WATTTIME_USERNAME: "carboncore"
-      WATTTIME_PASSWORD: "Carboncore123!"
+      # ELECTRICITYMAPS_TOKEN: "Z5NJGQ28hQq28m4NLsvu"
+      # ELECTRICITYMAPS_API_KEY: "Z5NJGQ28hQq28m4NLsvu"
+      # WATTTIME_USERNAME: "carboncore"
+      # WATTTIME_PASSWORD: "Carboncore123!"
+
+      ELECTRICITYMAPS_TOKEN:  ${ELECTRICITYMAPS_TOKEN:-dummy-token}
+      ELECTRICITYMAPS_API_KEY: ${ELECTRICITYMAPS_API_KEY:-dummy-token}   # optional, same value
+      WATTTIME_USERNAME:      ${WATTTIME_USERNAME:-dummy}
+      WATTTIME_PASSWORD:      ${WATTTIME_PASSWORD:-dummy}
+
+
+      
       OTEL_TRACES_EXPORTER: none
     depends_on:
       - backend
