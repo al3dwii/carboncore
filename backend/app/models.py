@@ -97,3 +97,11 @@ class ProjectToken(SQLModel, table=True):
     @staticmethod
     def verify(raw: str, hashed: str) -> bool:  # noqa: D401
         return bcrypt.verify(raw, hashed)
+
+
+# ─────────────────── Model rebuilds ───────────────────────────
+for _model in (Sku, CarbonSnapshot, EventType, SavingEvent, ProjectToken):
+    try:  # Pydantic v2
+        _model.model_rebuild()
+    except AttributeError:  # v1 fallback
+        _model.update_forward_refs()
