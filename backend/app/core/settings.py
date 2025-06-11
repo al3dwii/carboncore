@@ -16,6 +16,13 @@ from typing import ClassVar, Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+# app/core/settings.py  (or wherever DATABASE_URL is defined)
+import os
+DEFAULT_SQLITE = "sqlite+aiosqlite:///./dev.db"
+
+DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_SQLITE)
+
+ENABLE_TRACING = os.getenv("ENABLE_TRACING", "true").lower() == "true"
 
 class Settings(BaseSettings):
     # ─────────────── Infrastructure ───────────────
