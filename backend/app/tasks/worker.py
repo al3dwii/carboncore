@@ -4,6 +4,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from ..core.settings import get_settings
 from ..services.catalogue_sync import sync_skus
 from ..core.deps import engine
+from .loader import load_plugin_tasks
 
 settings = get_settings()
 celery_app = Celery("worker", broker=settings.redis_url, backend=settings.redis_url)
@@ -11,7 +12,6 @@ celery_app = Celery("worker", broker=settings.redis_url, backend=settings.redis_
 # Make discoverable under default name
 celery = celery_app
 
-@celery_app.task
 def weekly_sync():
     import asyncio
     async def _run():
@@ -28,3 +28,4 @@ celery_app.conf.beat_schedule = {
     }
 }
 celery_app.conf.timezone = "UTC"
+load_plugin_tasks(celery_app)
