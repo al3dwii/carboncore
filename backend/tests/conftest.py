@@ -55,6 +55,7 @@ carbon_router.carbon_intensity = carbon_router.limiter.limit("30/minute")(carbon
 @pytest_asyncio.fixture
 async def client():
     """Reusable async HTTP client bound to the FastAPI app."""
+    carbon_router.limiter.reset()
     await init_db()
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
