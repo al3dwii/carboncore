@@ -10,26 +10,31 @@ Runtime configuration for Carbon-Core
 
 from __future__ import annotations
 
+# app/core/settings.py  (or wherever DATABASE_URL is defined)
+import os
 from functools import lru_cache
 from pathlib import Path
 from typing import ClassVar, Literal
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-# app/core/settings.py  (or wherever DATABASE_URL is defined)
-import os
+# Default to a local SQLite database when no DATABASE_URL is provided so that
+# the backend can run without Docker or Postgres. Tests override this value via
+# environment variables.
 DEFAULT_SQLITE = "sqlite+aiosqlite:///./dev.db"
 
-DATABASE_URL = os.getenv("DATABASE_URL", DEFAULT_SQLITE)
 
-ENABLE_TRACING = os.getenv("ENABLE_TRACING", "true").lower() == "true"
+def _env_bool(name: str, default: str = "false") -> bool:
+    """Return a boolean from environment variables."""
+    return os.getenv(name, default).lower() == "true"
 
 class Settings(BaseSettings):
     # ─────────────── Infrastructure ───────────────
-    DATABASE_URL: str = (
-        "postgresql+asyncpg://postgres:postgres@db:5432/carboncore"
-    )
-    REDIS_URL: str = "redis://redis:6379/0"
+    # Use SQLite and fakeredis by default so the backend can start without
+    # external services. Values are overridden automatically by environment
+    # variables in Docker or CI.
+    DATABASE_URL: str = os.getenv("DATABASE_URL", DEFAULT_SQLITE)
+    REDIS_URL: str = os.getenv("REDIS_URL", "fakeredis://")
 
     @property
     def redis_url(self) -> str:  # noqa: N802 — used by Celery settings
@@ -68,7 +73,7 @@ class Settings(BaseSettings):
 
     # ──────────── Observability ───────────────
     PROMETHEUS_EXPORT_PORT: int = 9100
-    ENABLE_TRACING: bool = True
+    ENABLE_TRACING: bool = _env_bool("ENABLE_TRACING")
     ENABLE_METRICS: bool = True
     ENABLE_LOG_ENRICH: bool = True                  # structlog processors
 
