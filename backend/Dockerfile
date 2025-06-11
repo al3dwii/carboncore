@@ -12,6 +12,7 @@ RUN pip install --no-cache-dir poetry==$POETRY_VERSION
 RUN poetry config virtualenvs.create false
 
 WORKDIR /code
+LABEL immutable="true"
 COPY backend/pyproject.toml backend/poetry.lock* /code/
 RUN poetry install --no-root --no-interaction
 
