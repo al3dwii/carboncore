@@ -12,7 +12,7 @@ from decimal import Decimal
 from uuid import UUID, uuid4
 
 from passlib.hash import bcrypt
-from sqlalchemy import Column, DateTime, Float, Numeric, text
+from sqlalchemy import Column, DateTime, Float, Numeric, JSON, text
 from sqlmodel import Field, SQLModel
 
 
@@ -59,11 +59,23 @@ class CarbonSnapshot(SQLModel, table=True):
     captured_at: datetime = Field(default_factory=datetime.utcnow, index=True)
 
 
+# ─────────────────── Plugin event types ────────────────────
+class EventType(SQLModel, table=True):
+    """Lookup table for saving event types with JSON schema."""
+
+    id: str = Field(primary_key=True, max_length=32)
+    json_schema: dict = Field(
+        default_factory=dict,
+        sa_column=Column(JSON, server_default="{}", nullable=False),
+    )
+
+
 # ─────────────────── Savings events log ───────────────────────
 class SavingEvent(SQLModel, table=True):
     id: UUID | None = Field(default_factory=uuid4, primary_key=True)
     project_id: UUID = Field(index=True)
     feature: str
+    event_type_id: str = Field(foreign_key="eventtype.id", nullable=False, default="default")
     kwh: float
     co2: float
     usd: Decimal

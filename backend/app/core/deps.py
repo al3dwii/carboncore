@@ -9,7 +9,7 @@ from sqlalchemy.ext.asyncio import (
 )
 from sqlmodel import SQLModel, select
 
-from app.models import ProjectToken
+from app.models import ProjectToken, EventType
 
 from .settings import get_settings
 
@@ -36,16 +36,16 @@ async def init_db() -> None:
     async with engine.begin() as conn:
         await conn.run_sync(SQLModel.metadata.create_all)
 
-    # Seed the default "demo" token used by the tests
+    # Seed the default "demo" token used by the tests and a default event type
     async with SessionLocal() as db:
         existing = await db.scalar(
             select(ProjectToken).where(ProjectToken.name == "demo")
         )
         if not existing:
-            db.add(
-                ProjectToken(
-                    name="demo",
-                    token_hash=ProjectToken.hash("demo"),
-                )
-            )
-            await db.commit()
+            db.add(ProjectToken(name="demo", token_hash=ProjectToken.hash("demo")))
+
+        default_et = await db.scalar(select(EventType).where(EventType.id == "default"))
+        if not default_et:
+            db.add(EventType(id="default", json_schema={}))
+
+        await db.commit()
