@@ -38,7 +38,7 @@ registry_dict = {m.id: m for m in manifests}
 
 target.write_text(
     "from app.plugin_manifest import PluginManifest, Route\n\n"
-    "REGISTRY = " + textwrap.indent(repr(registry_dict), " ") + "\n"
+    "registry = " + textwrap.indent(repr(registry_dict), " ") + "\n"
 )
 
 
