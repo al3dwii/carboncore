@@ -24,12 +24,29 @@ def upgrade() -> None:
     )
 
     with op.batch_alter_table('savingevent') as batch_op:
-        batch_op.add_column(sa.Column('event_type_id', sa.String(length=32), nullable=False, server_default='default'))
-        batch_op.create_foreign_key('fk_savingevent_event_type', 'eventtype', ['event_type_id'], ['id'])
+        batch_op.add_column(
+            sa.Column(
+                'event_type_id',
+                sa.String(length=32),
+                nullable=False,
+                server_default='default',
+            )
+        )
+        batch_op.create_foreign_key(
+            'fk_savingevent_event_type',
+            'eventtype',
+            ['event_type_id'],
+            ['id'],
+        )
+        batch_op.create_index(
+            'ix_savingevent_event_type_id',
+            ['event_type_id'],
+        )
 
 
 def downgrade() -> None:
     with op.batch_alter_table('savingevent') as batch_op:
+        batch_op.drop_index('ix_savingevent_event_type_id')
         batch_op.drop_constraint('fk_savingevent_event_type', type_='foreignkey')
         batch_op.drop_column('event_type_id')
 

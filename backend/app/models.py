@@ -76,7 +76,12 @@ class SavingEvent(SQLModel, table=True):
     id: UUID | None = Field(default_factory=uuid4, primary_key=True)
     project_id: UUID = Field(index=True)
     feature: str
-    event_type_id: str = Field(foreign_key="eventtype.id", nullable=False, default="default")
+    event_type_id: str = Field(
+        foreign_key="eventtype.id",
+        nullable=False,
+        default="default",
+        index=True,
+    )
     kwh: float
     co2: float
     usd: Decimal
