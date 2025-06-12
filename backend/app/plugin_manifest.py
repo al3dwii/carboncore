@@ -1,6 +1,7 @@
 # backend/app/plugin_manifest.py
 from pydantic import BaseModel
-from typing import List, Literal, Optional
+from typing import List, Literal, Optional, Union
+from fastapi import APIRouter
 
 class Route(BaseModel):
     handler: str                         # dotted path  "backend.app.routers.skus:router"
@@ -12,4 +13,7 @@ class PluginManifest(BaseModel):
     id: str
     version: str = "0.1.0"
     tasks: List[str] = []
-    routes: List[Route] = []            # ← new
+    routes: List[Union[APIRouter, Route]] = []            # ← new
+
+    class Config:
+        arbitrary_types_allowed = True

@@ -1,8 +1,2 @@
-from app.plugin_manifest import PluginManifest, Route
-
-REGISTRY: dict[str, PluginManifest] = {
-    "core": PluginManifest(**{'id': 'core', 'event_types': [], 'routes': [{'handler': 'app.routers.skus:router', 'path': None, 'method': 'GET', 'prefix': ''}, {'handler': 'app.routers.carbon:router', 'path': None, 'method': 'GET', 'prefix': ''}, {'handler': 'app.routers.events:router', 'path': None, 'method': 'GET', 'prefix': ''}, {'handler': 'app.routers.tokens:router', 'path': None, 'method': 'GET', 'prefix': ''}], 'schedules': []}),
-}
-
-registry = REGISTRY  # FastAPI alias
-__all__ = ['REGISTRY', 'registry']
+from app.schemas.plugins import PluginManifest, Route
+registry =  [PluginManifest(id='core', event_types=[], routes=[<fastapi.routing.APIRouter object at 0x7f6b78b46e90>, <fastapi.routing.APIRouter object at 0x7f6b733badd0>, <fastapi.routing.APIRouter object at 0x7f6b733baa90>, <fastapi.routing.APIRouter object at 0x7f6b73320a90>], schedules=[])]
