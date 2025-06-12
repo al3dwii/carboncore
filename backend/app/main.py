@@ -84,35 +84,40 @@ app.add_middleware(
 # ───────────── Plug-in routing ─────────────
 for pm in registry.values():
     for route in pm.routes:
-        # Case 1 • APIRouter
+        # Case 1 • APIRouter already provided
         if isinstance(route, APIRouter):
-            app.include_router(route, prefix=f"/{pm.id}")
+            app.include_router(route, prefix=route.prefix or "")
             log.info("router.mounted", plugin=pm.id, router=route.__class__.__name__)
             continue
 
-        # Case 2 • Lightweight route spec
+        # Case 2 • Dotted path to router or function
         if not getattr(route, "path", None):
-            log.warning(
-                "route.skipped",
-                plugin=pm.id,
-                reason="no path defined on route object",
-            )
+            try:
+                module_path, obj_name = route.handler.split(":")
+                target: Any = getattr(import_module(module_path), obj_name)
+            except Exception as exc:  # ImportError / ValueError …
+                log.error("route.import_failed", plugin=pm.id, err=str(exc))
+                continue
+
+            if isinstance(target, APIRouter):
+                app.include_router(target, prefix=route.prefix or "")
+                log.info("router.mounted", plugin=pm.id, router=target.__class__.__name__)
+            else:
+                log.warning(
+                    "route.skipped",
+                    plugin=pm.id,
+                    reason="no path defined on route object",
+                )
             continue
 
         try:
             module_path, obj_name = route.handler.split(":")
             target: Any = getattr(import_module(module_path), obj_name)
-        except Exception as exc:                       # ImportError / ValueError …
+        except Exception as exc:  # ImportError / ValueError …
             log.error("route.import_failed", plugin=pm.id, err=str(exc))
             continue
 
-        # Always prefix with /<plugin-id>
-        prefix = f"/{pm.id}"
-        final_path = (
-            f"{prefix}{route.path}"
-            if route.path.startswith("/")
-            else f"{prefix}/{route.path}"
-        )
+        final_path = route.path if route.path.startswith("/") else f"/{route.path}"
 
         app.add_api_route(
             final_path,
