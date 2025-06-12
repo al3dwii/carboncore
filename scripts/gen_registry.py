@@ -24,12 +24,14 @@ lines = [
     "from app.schemas.plugins import PluginManifest",
 ]
 for name in manifests:
-    lines.append(f"from plugins.{name}.manifest import manifest as {name}_manifest")
+    var = name.replace('-', '_')
+    lines.append(f"from plugins.{name}.manifest import manifest as {var}_manifest")
 
 lines.append("")
 lines.append("REGISTRY: Dict[str, PluginManifest] = {")
 for name in manifests:
-    lines.append(f'    "{name}": {name}_manifest,')
+    var = name.replace('-', '_')
+    lines.append(f'    "{name}": {var}_manifest,')
 lines.append("}")
 lines.append("")
 lines.append("registry = REGISTRY")
