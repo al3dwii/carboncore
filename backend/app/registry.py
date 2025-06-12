@@ -1,8 +1,11 @@
-from app.schemas.plugins import PluginManifest, Route
+from typing import Dict
 
-REGISTRY: dict[str, PluginManifest] = {
-    "core": PluginManifest(**{'id': 'core', 'event_types': [], 'routes': [{'handler': 'app.routers.skus:router', 'path': None, 'method': 'GET', 'prefix': ''}, {'handler': 'app.routers.carbon:router', 'path': None, 'method': 'GET', 'prefix': ''}, {'handler': 'app.routers.events:router', 'path': None, 'method': 'GET', 'prefix': ''}, {'handler': 'app.routers.tokens:router', 'path': None, 'method': 'GET', 'prefix': ''}], 'schedules': []}),
+from app.schemas.plugins import PluginManifest
+from plugins.core.manifest import manifest as core_manifest
+
+REGISTRY: Dict[str, PluginManifest] = {
+    "core": core_manifest,
 }
 
-registry = REGISTRY  # FastAPI alias
+registry = REGISTRY
 __all__ = ['REGISTRY', 'registry']
