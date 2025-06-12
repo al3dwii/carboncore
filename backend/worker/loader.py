@@ -6,7 +6,7 @@ from celery.schedules import crontab
 app = Celery("carboncore")
 app.config_from_object("backend.app.settings", namespace="CELERY")
 
-for pm in registry:
+for pm in registry.values():
     for s in pm.schedules:
         mod, obj = s.task.split(":")
         task = getattr(import_module(mod), obj)
