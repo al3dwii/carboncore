@@ -15,6 +15,7 @@ from passlib.hash import bcrypt
 from sqlalchemy import Column, DateTime, Float, Numeric, JSON, text
 from sqlmodel import Field, SQLModel
 
+from pydantic import BaseModel
 
 # ───────────────────── Cloud SKU catalogue ─────────────────────
 class Sku(SQLModel, table=True):
@@ -97,3 +98,13 @@ class ProjectToken(SQLModel, table=True):
     @staticmethod
     def verify(raw: str, hashed: str) -> bool:  # noqa: D401
         return bcrypt.verify(raw, hashed)
+
+
+# ───── fix: rebuild forward-ref models for OpenAPI ─────
+
+for _m in list(globals().values()):
+    if isinstance(_m, type) and issubclass(_m, BaseModel):
+        try:
+            _m.model_rebuild()          # Pydantic v2 API
+        except AttributeError:
+            _m.update_forward_refs()    # for v1 fallback
