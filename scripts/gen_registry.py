@@ -6,7 +6,9 @@ import sys
 
 root = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(root / "backend"))
-from app.schemas.plugins import PluginManifest
+from app.schemas.plugins import PluginManifest as SchemaManifest
+from app.plugin_manifest import PluginManifest
+
 manifests = []
 for path in (root / "backend" / "plugins").glob("*/manifest.py"):
     spec = importlib.util.spec_from_file_location(path.stem, path)
@@ -19,9 +21,15 @@ dup = [i for i in ids if ids.count(i) > 1]
 if dup:
     raise SystemExit(f"duplicate plugin id {dup}")
 
-reg_py = (
-    "from app.schemas.plugins import PluginManifest, Route\nregistry = "
-    + textwrap.indent(repr(manifests), " ")
+(
+    reg_py := "from app.plugin_manifest import PluginManifest, Route\nregistry = "
+    + textwrap.indent(
+        repr([
+            PluginManifest(**(m.model_dump() if hasattr(m, "model_dump") else m.dict()))
+            for m in manifests
+        ]),
+        " ",
+    )
 )
 (root / "backend" / "app" / "registry.py").write_text(reg_py)
 print("\u2705 generated backend/app/registry.py")
