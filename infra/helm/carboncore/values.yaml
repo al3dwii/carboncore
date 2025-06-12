@@ -1,7 +1,7 @@
-replicaCount: 1
-image:
-  repository: carboncore/backend
-  tag: latest
-service:
-  type: ClusterIP
-  port: 80
+kernel:
+  image: ghcr.io/org/kernel:v2.0-dev
+console:
+  image: ghcr.io/org/console:v2.0-dev
+env:
+  API_URL: "http://kernel:8000"
+  LD_SDK_KEY: "xxx"

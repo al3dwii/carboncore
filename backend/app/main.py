@@ -37,7 +37,7 @@ from app.core.ratelimit import (
     limiter,
 )
 from app.middleware.secure_headers import SecureHeadersMiddleware
-from app.registry import REGISTRY
+from app.registry import registry
 
 # ───────────── rate-limit defaults ─────────────
 # 1 request / minute globally; tests override with route-level decorator
@@ -82,7 +82,7 @@ app.add_middleware(
 )
 
 # ───────────── Plugin Routers (dynamic) ────
-for pm in REGISTRY.values():
+for pm in registry:
     for route in pm.routes:
         mod_path, obj_name = route.handler.split(":")
         target = getattr(import_module(mod_path), obj_name)
