@@ -99,12 +99,10 @@ class ProjectToken(SQLModel, table=True):
     def verify(raw: str, hashed: str) -> bool:  # noqa: D401
         return bcrypt.verify(raw, hashed)
 
+# ─────────────────── Model rebuilds ───────────────────────────
+for _model in (Sku, CarbonSnapshot, EventType, SavingEvent, ProjectToken):
+    try:  # Pydantic v2
+        _model.model_rebuild()
+    except AttributeError:  # v1 fallback
+        _model.update_forward_refs()
 
-# ───── fix: rebuild forward-ref models for OpenAPI ─────
-
-for _m in list(globals().values()):
-    if isinstance(_m, type) and issubclass(_m, BaseModel):
-        try:
-            _m.model_rebuild()          # Pydantic v2 API
-        except AttributeError:
-            _m.update_forward_refs()    # for v1 fallback
