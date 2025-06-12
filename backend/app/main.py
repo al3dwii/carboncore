@@ -10,6 +10,7 @@ CarbonCore FastAPI entry-point  (v0.2.0-frozen)
 """
 
 from __future__ import annotations
+import app.otel  # noqa
 
 # ───────────── stdlib ─────────────
 from contextlib import asynccontextmanager
