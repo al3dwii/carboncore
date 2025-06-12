@@ -29,8 +29,7 @@ TARGET: Final[pathlib.Path] = ROOT / "app" / "registry.py"
 # Ensure backend/ is import-able (needed for pydantic models, etc.)
 sys.path.insert(0, str(ROOT))
 
-from app.plugin_manifest import PluginManifest  # noqa: E402
-from app.schemas.plugins import Route          # noqa: E402
+from app.schemas.plugins import PluginManifest, Route  # noqa: E402
 
 # ───────────────────────── discover manifests ─────────────────────
 manifests: list[PluginManifest] = []
@@ -53,7 +52,7 @@ REGISTRY_DICT: dict[str, PluginManifest] = {m.id: m for m in sorted(manifests, k
 
 # ───────────────────────── write registry.py ──────────────────────
 lines: list[str] = [
-    "from app.plugin_manifest import PluginManifest, Route",
+    "from app.schemas.plugins import PluginManifest, Route",
     "",
     "REGISTRY: dict[str, PluginManifest] = {",
 ]
