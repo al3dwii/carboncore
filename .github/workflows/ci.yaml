@@ -59,3 +59,8 @@ jobs:
           poetry run alembic downgrade +1 >/dev/null \
             && echo '❌ Uncommitted migration' && exit 1 \
             || echo '✅ migrations up-to-date'
+
+      - name: Build and publish SDK
+        env:
+          TWINE_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
+        run: ./scripts/build_sdk.sh
