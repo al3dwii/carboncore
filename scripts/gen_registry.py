@@ -1,35 +1,39 @@
 #!/usr/bin/env python3
+"""Generate backend/app/registry.py from plug-in manifests."""
+
 import importlib.util
 import pathlib
-import textwrap
 import sys
 
 root = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(root / "backend"))
-from app.schemas.plugins import PluginManifest as SchemaManifest
-from app.plugin_manifest import PluginManifest
 
-manifests = []
+manifests: dict[str, object] = {}
 for path in (root / "backend" / "plugins").glob("*/manifest.py"):
     spec = importlib.util.spec_from_file_location(path.stem, path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)  # type: ignore
-    manifests.append(mod.manifest)
+    manifest = getattr(mod, "manifest", None)
+    if manifest is None:
+        continue
+    manifests[manifest.id] = manifest
 
-ids = [m.id for m in manifests]
-dup = [i for i in ids if ids.count(i) > 1]
-if dup:
-    raise SystemExit(f"duplicate plugin id {dup}")
+lines = [
+    "from typing import Dict",
+    "",
+    "from app.schemas.plugins import PluginManifest",
+]
+for name in manifests:
+    lines.append(f"from plugins.{name}.manifest import manifest as {name}_manifest")
 
-(
-    reg_py := "from app.plugin_manifest import PluginManifest, Route\nregistry = "
-    + textwrap.indent(
-        repr([
-            PluginManifest(**(m.model_dump() if hasattr(m, "model_dump") else m.dict()))
-            for m in manifests
-        ]),
-        " ",
-    )
-)
-(root / "backend" / "app" / "registry.py").write_text(reg_py)
+lines.append("")
+lines.append("REGISTRY: Dict[str, PluginManifest] = {")
+for name in manifests:
+    lines.append(f'    "{name}": {name}_manifest,')
+lines.append("}")
+lines.append("")
+lines.append("registry = REGISTRY")
+lines.append("__all__ = ['REGISTRY', 'registry']")
+
+(root / "backend" / "app" / "registry.py").write_text("\n".join(lines) + "\n")
 print("\u2705 generated backend/app/registry.py")
