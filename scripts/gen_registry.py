@@ -1,22 +1,27 @@
 #!/usr/bin/env python3
-"""Generate plugin registry for the backend."""
-
-import importlib
-import pkgutil
-from pathlib import Path
+import importlib.util
+import pathlib
+import textwrap
 import sys
 
-ROOT = Path(__file__).resolve().parents[1]
-PLUGINS_DIR = ROOT / "backend" / "plugins"
-REGISTRY_FILE = ROOT / "backend" / "app" / "registry.py"
+root = pathlib.Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(root / "backend"))
+from app.schemas.plugins import PluginManifest
+manifests = []
+for path in (root / "backend" / "plugins").glob("*/manifest.py"):
+    spec = importlib.util.spec_from_file_location(path.stem, path)
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)  # type: ignore
+    manifests.append(mod.manifest)
 
-sys.path.insert(0, str(ROOT / "backend"))
+ids = [m.id for m in manifests]
+dup = [i for i in ids if ids.count(i) > 1]
+if dup:
+    raise SystemExit(f"duplicate plugin id {dup}")
 
-lines = ["from .plugin_manifest import PluginManifest", "", "REGISTRY = {"]
-for finder, name, ispkg in pkgutil.iter_modules([str(PLUGINS_DIR)]):
-    module = importlib.import_module(f"plugins.{name}.manifest")
-    manifest = getattr(module, "manifest")
-    lines.append(f'    "{manifest.id}": PluginManifest(**{manifest.dict()}),')
-lines.append("}\n")
-REGISTRY_FILE.write_text("\n".join(lines))
-print(f"Wrote {REGISTRY_FILE}")
+reg_py = (
+    "from app.schemas.plugins import PluginManifest, Route\nregistry = "
+    + textwrap.indent(repr(manifests), " ")
+)
+(root / "backend" / "app" / "registry.py").write_text(reg_py)
+print("\u2705 generated backend/app/registry.py")
