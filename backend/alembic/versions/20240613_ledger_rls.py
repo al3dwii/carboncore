@@ -14,6 +14,8 @@ def upgrade() -> None:
             ON ledger FOR SELECT USING (true);
         CREATE POLICY ledger_no_update
             ON ledger FOR UPDATE USING (false);
+        CREATE POLICY ledger_no_delete
+            ON ledger FOR DELETE USING (false);
         -- 2) write-once checksum trigger
         CREATE EXTENSION IF NOT EXISTS "pgcrypto";
         CREATE OR REPLACE FUNCTION set_checksum() RETURNS trigger AS $$

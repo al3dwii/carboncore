@@ -55,6 +55,7 @@ opentelemetry-exporter-otlp          = "^1.24.0"
 opentelemetry-instrumentation-fastapi = { version = "0.48b0", allow-prereleases = true }
 opentelemetry-instrumentation-httpx  = "^0.48b0"
 opentelemetry-instrumentation-sqlalchemy = "^0.48b0"
+opentelemetry-instrumentation-celery = "^0.48b0"
 
 # ───────────────────────────── Dev / CI ────────────────────────────
 bcrypt = "<4"

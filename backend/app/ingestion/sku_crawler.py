@@ -35,13 +35,17 @@ async def fetch_aws():
             watts = 8 * int(attrs["vcpu"])
             yield sku, price, watts
 
-async def main():
+async def main() -> None:
     pool = await asyncpg.create_pool(PG_DSN)
-    async with pool.acquire() as conn:
-        async for sku, price, watts in fetch_aws():
-            await save(conn, sku, price, watts)
-            print("✓ upsert", sku)
-    await pool.close()
+    try:
+        while True:
+            async with pool.acquire() as conn:
+                async for sku, price, watts in fetch_aws():
+                    await save(conn, sku, price, watts)
+                    print("✓ upsert", sku)
+            await asyncio.sleep(86400)
+    finally:
+        await pool.close()
 
 if __name__ == "__main__":
     asyncio.run(main())

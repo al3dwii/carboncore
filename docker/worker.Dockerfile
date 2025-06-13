@@ -1,6 +1,7 @@
 FROM python:3.12-slim
 WORKDIR /opt
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1
+ENV OTEL_PYTHON_DISABLED_INSTRUMENTATIONS=jinja2
 RUN apt-get update && apt-get install -y gcc build-essential && rm -rf /var/lib/apt/lists/*
 RUN pip install poetry && poetry config virtualenvs.create false
 COPY backend/pyproject.toml backend/poetry.lock* ./

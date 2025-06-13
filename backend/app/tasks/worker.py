@@ -1,5 +1,6 @@
 from celery import Celery
 from celery.schedules import crontab
+from opentelemetry.instrumentation.celery import CeleryInstrumentor
 from sqlmodel.ext.asyncio.session import AsyncSession
 from ..core.settings import get_settings
 from ..services.catalogue_sync import sync_skus
@@ -8,6 +9,7 @@ from .loader import load_plugin_tasks
 
 settings = get_settings()
 celery_app = Celery("worker", broker=settings.redis_url, backend=settings.redis_url)
+CeleryInstrumentor().instrument()
 
 # Make discoverable under default name
 celery = celery_app
