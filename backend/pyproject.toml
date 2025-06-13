@@ -78,3 +78,16 @@ extend-select = ["I"]
 python_version = "3.12"
 strict         = true
 files          = ["app"]
+
+[tool.setuptools.packages.find]
+where   = ["."]
+include = ["app*", "backend*", "worker*", "plugins*", "alembic*"]
+
+
+[project]
+name    = "carboncore-backend"
+version = "0.1.0-beta.1"          # keep whatever version you like
+
+[build-system]
+requires      = ["setuptools>=67", "wheel"]
+build-backend = "setuptools.build_meta"
