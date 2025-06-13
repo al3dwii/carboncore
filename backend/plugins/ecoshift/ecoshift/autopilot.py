@@ -1,5 +1,9 @@
 from datetime import datetime, timedelta
-from backend.worker.loader import app
+from celery import Celery
+try:
+    from backend.worker.loader import app
+except Exception:  # fall back when backend package not on path
+    app = Celery("carboncore")
 from plugins.ecoshift.ecoshift.views import suggest
 
 @app.task(name="shift.autopilot")

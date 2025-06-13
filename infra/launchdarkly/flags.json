@@ -1,0 +1,14 @@
+{
+  "items": [
+    {
+      "key": "shift.enabled",
+      "name": "EcoShift enabled",
+      "environments": {"production": {"on": true}}
+    },
+    {
+      "key": "comply.enabled",
+      "name": "CarbonComply enabled",
+      "environments": {"production": {"on": true}}
+    }
+  ]
+}

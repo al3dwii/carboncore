@@ -1,0 +1,10 @@
+{
+  "Rules": [
+    {
+      "ID": "expire-exports",
+      "Status": "Enabled",
+      "Prefix": "",
+      "Expiration": { "Days": 30 }
+    }
+  ]
+}

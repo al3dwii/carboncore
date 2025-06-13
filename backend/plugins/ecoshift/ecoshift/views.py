@@ -1,7 +1,7 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Body
 from datetime import datetime, timedelta
 from sqlalchemy import text
-from app.database import SessionLocal
+from app.core.deps import SessionLocal
 
 router = APIRouter()
 
@@ -20,7 +20,7 @@ def forecast_carbon(zone: str, hours: int = 24, db=Depends(SessionLocal)):
     return [dict(r) for r in q]
 
 @router.post("/suggest")
-def suggest(job: dict, db=Depends(SessionLocal)):
+def suggest(job: dict = Body(...), db=Depends(SessionLocal)):
     earliest = datetime.fromisoformat(job["earliest"])
     latest = datetime.fromisoformat(job["latest"])
     q = db.execute(
