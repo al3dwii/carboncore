@@ -1,5 +1,6 @@
 'use client';
 import useSWR from 'swr';
+import { useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Bar } from 'react-chartjs-2';
 
@@ -16,6 +17,15 @@ export default function SavingsChart() {
     '/events?field=meta.kg_co2&aggregate=sum',
     fetcher
   );
+
+  useEffect(() => {
+    fetch('/events?kind=edge_route&aggregate=avg&field=meta.rtt')
+      .then((r) => r.json())
+      .then(({ avg }) => {
+        const el = document.getElementById('lat');
+        if (el) el.textContent = String(Math.round(avg ?? 0));
+      });
+  }, []);
   if (!data) return 'Loading…';
 
   return (
@@ -29,6 +39,9 @@ export default function SavingsChart() {
           <span id="co2">
             {co2 ? ((co2.sum || 0).toFixed(1)) : '…'}
           </span>
+        </div>
+        <div className="p-4 border rounded">
+          Avg latency Δ — <span id="lat">0</span> ms
         </div>
       </div>
       <Card>
