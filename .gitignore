@@ -42,3 +42,7 @@ celerybeat-schedule.db
 # test artefacts
 .pytest_cache/
 __pycache__/
+
+# build artefacts
+backend/*.egg-info/
+backend/src/

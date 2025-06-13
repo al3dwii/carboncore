@@ -56,6 +56,9 @@ opentelemetry-instrumentation-sqlalchemy = "^0.48b0"
 
 # ───────────────────────────── Dev / CI ────────────────────────────
 bcrypt = "<4"
+pandas = "^2.3.0"
+numpy = "^2.3.0"
+pytz = "^2025.2"
 [tool.poetry.group.dev.dependencies]
 pytest               = "^8.2.0"
 pytest-asyncio       = "0.23.6"
@@ -78,3 +81,16 @@ extend-select = ["I"]
 python_version = "3.12"
 strict         = true
 files          = ["app"]
+
+[tool.setuptools.packages.find]
+where   = ["."]
+include = ["app*", "backend*", "worker*", "plugins*", "alembic*"]
+
+
+[project]
+name    = "carboncore-backend"
+version = "0.1.0-beta.1"          # keep whatever version you like
+
+[build-system]
+requires      = ["setuptools>=67", "wheel"]
+build-backend = "setuptools.build_meta"
