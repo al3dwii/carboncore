@@ -1,0 +1,6 @@
+name = "edge-router-demo"
+main = "worker.js"
+compatibility_date = "2025-06-25"
+[vars]
+API_URL = "https://console-stg.example.com"
+API_TOKEN = "xxx"

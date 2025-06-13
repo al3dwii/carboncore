@@ -21,5 +21,19 @@ export const registry = [
     routes: [
       { component: "ComplyPage", path: "/tool/carbon-comply", id: "carbon-comply" }
     ]
+  },
+  {
+    id: "edge-router",
+    sidebar: "Edge Router",
+    icon: "Share2",
+    routes: [
+      { component: "EdgePage", path: "/tool/edge-router", id: "edge-router" }
+    ]
+  }
+  ,{
+    id: "budget-copilot",
+    sidebar: "Budget Copilot",
+    icon: "TrendingDown",
+    routes:[{component: "BudgetPage", path: "/tool/budget", id: "budget-copilot"}]
   }
 ] as const;

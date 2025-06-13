@@ -47,3 +47,7 @@ __pycache__/
 # build artefacts
 backend/*.egg-info/
 backend/src/
+
+# plugin build artifacts
+backend/plugins/dist/*.whl
+backend/plugins/dist/*.tar.gz
