@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import glob from "glob";
-import { manifest as schema } from "./src/plugin-schema";
+import { manifest as schema } from "./src/plugin-schema.ts";
 
 const manifests = glob
   .sync("plugins/*/manifest.ts")
