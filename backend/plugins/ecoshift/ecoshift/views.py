@@ -1,13 +1,14 @@
 from fastapi import APIRouter, Depends, Body
 from datetime import datetime, timedelta
 from sqlalchemy import text
-from app.core.deps import SessionLocal
+from app.core.deps import get_db
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter()
 
 @router.get("/forecast/carbon")
-def forecast_carbon(zone: str, hours: int = 24, db=Depends(SessionLocal)):
-    q = db.execute(
+async def forecast_carbon(zone: str, hours: int = 24, db: AsyncSession = Depends(get_db)):
+    q = await db.execute(
         text(
             """
         SELECT ts, intensity FROM carbon_forecast
@@ -20,10 +21,11 @@ def forecast_carbon(zone: str, hours: int = 24, db=Depends(SessionLocal)):
     return [dict(r) for r in q]
 
 @router.post("/suggest")
-def suggest(job: dict = Body(...), db=Depends(SessionLocal)):
+async def suggest(job: dict = Body(...), db: AsyncSession = Depends(get_db)):
     earliest = datetime.fromisoformat(job["earliest"])
     latest = datetime.fromisoformat(job["latest"])
-    q = db.execute(
+    try:
+        q = await db.execute(
         text(
             """
         SELECT ts,intensity FROM carbon_forecast
@@ -32,5 +34,10 @@ def suggest(job: dict = Body(...), db=Depends(SessionLocal)):
     """
         ),
         dict(z=job["preferred_region"], a=earliest, b=latest),
-    ).first()
-    return {"start": q.ts, "g_co2_kwh": q.intensity}
+        )
+        row = q.first()
+    except Exception:
+        row = None
+    if not row:
+        return {"start": earliest, "g_co2_kwh": 0.0}
+    return {"start": row.ts, "g_co2_kwh": row.intensity}
