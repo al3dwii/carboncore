@@ -30,3 +30,5 @@ node_modules/
 # macOS
 .DS_Store
 *.db
+.venv/
+*.db
