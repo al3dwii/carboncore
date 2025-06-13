@@ -32,3 +32,13 @@ node_modules/
 *.db
 .venv/
 *.db
+# local virtual-env
+.venv/
+
+# throw-away databases & celery beat schedule
+*.db
+celerybeat-schedule.db
+
+# test artefacts
+.pytest_cache/
+__pycache__/

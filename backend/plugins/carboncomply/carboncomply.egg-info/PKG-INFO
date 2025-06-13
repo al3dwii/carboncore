@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: carboncomply
+Version: 0.1.0
+Summary: CarbonComply ESRS export plug-in for CarbonCore
+Requires-Python: >=3.9
+Requires-Dist: fastapi
+Requires-Dist: pandas
+Requires-Dist: sqlalchemy
+Requires-Dist: openpyxl

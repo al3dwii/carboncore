@@ -1,0 +1,8 @@
+pyproject.toml
+ecoshift/autopilot.py
+ecoshift/views.py
+ecoshift.egg-info/PKG-INFO
+ecoshift.egg-info/SOURCES.txt
+ecoshift.egg-info/dependency_links.txt
+ecoshift.egg-info/requires.txt
+ecoshift.egg-info/top_level.txt
