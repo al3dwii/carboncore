@@ -5,12 +5,23 @@ on:
 
 env:
   REGISTRY: ghcr.io/${{ github.repository_owner }}
-  IMAGE: carboncore-api
 
 jobs:
   build:
     runs-on: ubuntu-latest
     permissions: write-all
+    strategy:
+      matrix:
+        include:
+          - name: api
+            dockerfile: docker/api.Dockerfile
+            image: carboncore-api
+          - name: worker
+            dockerfile: docker/worker.Dockerfile
+            image: carboncore-worker
+          - name: ingestor
+            dockerfile: docker/ingestor.Dockerfile
+            image: carboncore-ingestor
     steps:
     - uses: actions/checkout@v4
 
@@ -29,31 +40,33 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: .
-        file: docker/api.Dockerfile
+        file: ${{ matrix.dockerfile }}
         push: true
-        tags: ${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ github.sha }}
+        tags: ${{ env.REGISTRY }}/${{ matrix.image }}:${{ github.sha }}
 
     - name: Trivy scan
       uses: aquasecurity/trivy-action@v0.18.0
       with:
-        image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ github.sha }}
+        image-ref: ${{ env.REGISTRY }}/${{ matrix.image }}:${{ github.sha }}
         ignore-unfixed: true
 
     - name: Cosign sign
       uses: sigstore/cosign-installer@v3
-    - run: cosign sign --yes ${{ env.REGISTRY }}/${{ env.IMAGE }}@${{ steps.build.outputs.digest }} \
+    - run: cosign sign --yes ${{ env.REGISTRY }}/${{ matrix.image }}@${{ steps.build.outputs.digest }} \
         --key env://COSIGN_PRIVATE_KEY
       env:
         COSIGN_PRIVATE_KEY: ${{ secrets.COSIGN_KEY }}
 
     - name: Deploy to Fly (blue-green)
+      if: matrix.name == 'api'
       uses: superfly/flyctl-actions@1.5
       with:
-        args: "deploy --image ${{ env.REGISTRY }}/${{ env.IMAGE }}:${{ github.sha }} --strategy bluegreen --wait-timeout 120"
+        args: "deploy --image ${{ env.REGISTRY }}/${{ matrix.image }}:${{ github.sha }} --strategy bluegreen --wait-timeout 120"
       env:
         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
 
     - name: Health check
+      if: matrix.name == 'api'
       run: |
         for i in {1..10}; do
           curl -fsSL https://api.yourapp.com/health && exit 0
@@ -62,7 +75,7 @@ jobs:
         echo "Health check failed" && exit 1
 
     - name: Rollback on failure
-      if: failure()
+      if: failure() && matrix.name == 'api'
       run: flyctl releases rollback -y
       env:
         FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
