@@ -1,6 +1,11 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect } from "react";
 import { sidebar } from "../sidebar-meta";
 export default function Layout({ children }:{children:ReactNode}){
+  useEffect(()=>{
+    fetch("/events?kind=budget_overshoot")
+      .then(r=>r.json())
+      .then(({items})=>{ if(items?.length) localStorage.setItem("overshoot","1");});
+  },[]);
   return (
     <div className="flex">
       <aside className="w-56 border-r p-4 space-y-2">
