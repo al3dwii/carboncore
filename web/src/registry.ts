@@ -36,4 +36,15 @@ export const registry = [
     icon: "TrendingDown",
     routes:[{component: "BudgetPage", path: "/tool/budget", id: "budget-copilot"}]
   }
+  ,{
+    id: "green-dev",
+    sidebar: "GreenDev Bot",
+    icon: "Bot",
+    routes:[{component: "GreenDevPage", path: "/tool/greendev", id: "green-dev"}]
+  }
+  ,{
+    id: "eco-label",
+    sidebar: null,
+    routes:[]
+  }
 ] as const;

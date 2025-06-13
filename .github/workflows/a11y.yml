@@ -1,0 +1,11 @@
+name: a11y
+on: [pull_request]
+jobs:
+  lh:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with: {node-version: 20}
+    - run: npm i -g @lhci/cli && pnpm --filter console build
+    - run: lhci collect --url=http://localhost:3000 --settings.preset=lighthouse:no-pwa
