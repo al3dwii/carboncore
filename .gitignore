@@ -20,6 +20,7 @@ docker-volume/
 
 # ── Logs / temp / secrets ───────────────────────────────────────────────
 *.log
+!.env
 .env*
 .DS_Store
 

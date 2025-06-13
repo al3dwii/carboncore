@@ -91,6 +91,32 @@ services:
       - redis
       - tempo
 
+  grid-ingestor:
+    build:
+      context: .
+      dockerfile: docker/ingestor.Dockerfile
+    environment:
+      - PG_DSN=postgresql://core:core@db/core
+      - REGIONS=EU_DE,EU_FR
+    restart: unless-stopped
+
+  sku-crawler:
+    build:
+      context: .
+      dockerfile: docker/ingestor.Dockerfile
+    command: python -m ingestion.sku_crawler
+    deploy:
+      restart_policy:
+        condition: on-failure
+
+  grafana-agent:
+    image: grafana/agent:v0.41.2
+    command: |
+      --metrics.wal-directory=/tmp/agent
+      --config.file=/etc/agent.yaml
+    volumes:
+      - ./docker/agent.yaml:/etc/agent.yaml
+
   # ─────────── optional front-end ───────────
   # web:
   #   build:

@@ -1,0 +1,9 @@
+{
+  "resource_changes": [{
+    "type":"aws_instance",
+    "change": {
+      "actions": ["create"],
+      "after":{"instance_type":"m5.large","availability_zone":"eu-central-1a"}
+    }
+  }]
+}
