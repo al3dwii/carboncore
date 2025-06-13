@@ -8,24 +8,25 @@ import sys
 root = pathlib.Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(root / "backend"))
 
-manifests: dict[str, object] = {}
+manifests: dict[str, tuple[str, object]] = {}
 for path in (root / "backend" / "plugins").glob("*/manifest.py"):
-    spec = importlib.util.spec_from_file_location(path.stem, path)
+    pkg = path.parent.name
+    spec = importlib.util.spec_from_file_location(pkg, path)
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)  # type: ignore
     manifest = getattr(mod, "manifest", None)
     if manifest is None:
         continue
-    manifests[manifest.id] = manifest
+    manifests[manifest.id] = (pkg, manifest)
 
 lines = [
     "from typing import Dict",
     "",
     "from app.schemas.plugins import PluginManifest",
 ]
-for name in manifests:
+for name, (pkg, _) in manifests.items():
     var = name.replace('-', '_')
-    lines.append(f"from plugins.{name}.manifest import manifest as {var}_manifest")
+    lines.append(f"from plugins.{pkg}.manifest import manifest as {var}_manifest")
 
 lines.append("")
 lines.append("REGISTRY: Dict[str, PluginManifest] = {")
