@@ -9,6 +9,7 @@ from plugins.budget.manifest import manifest as budget_copilot_manifest
 from plugins.carboncomply.manifest import manifest as carbon_comply_manifest
 from plugins.greendev.manifest import manifest as green_dev_manifest
 from plugins.edge_router.manifest import manifest as edge_router_manifest
+from plugins.offset_sync.manifest import manifest as offset_sync_manifest
 
 REGISTRY: Dict[str, PluginManifest] = {
     "eco-shift": eco_shift_manifest,
@@ -19,6 +20,7 @@ REGISTRY: Dict[str, PluginManifest] = {
     "carbon-comply": carbon_comply_manifest,
     "green-dev": green_dev_manifest,
     "edge-router": edge_router_manifest,
+    "offset-sync": offset_sync_manifest,
 }
 
 registry = REGISTRY
