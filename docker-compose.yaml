@@ -87,6 +87,7 @@ services:
       worker -B --loglevel=info
     volumes:
       - ./backend:/code
+      - celery_beat:/code/celerybeat-schedule.db
     env_file: .env.development
     environment: *common-env
     depends_on:
@@ -146,6 +147,7 @@ services:
 
 volumes:
   db_data:
+  celery_beat:
 
 networks:
   default:

@@ -7,6 +7,7 @@ Supported back-ends:
 * Ember (public API used as fallback)
 """
 import os, sys, time, requests, datetime as dt
+import logging
 import asyncpg, asyncio
 from typing import Dict
 
@@ -15,6 +16,16 @@ REFRESH_SECS = int(os.getenv("GRID_REFRESH_SECS", 300))
 REGIONS = os.getenv("REGIONS", "EU_DE,EU_FR,US_CA").split(",")
 
 AUTH = (os.getenv("WATTTIME_USER"), os.getenv("WATTTIME_PASS"))
+log = logging.getLogger(__name__)
+
+def safe_get(url: str, **kw):
+    try:
+        r = requests.get(url, **kw)
+        r.raise_for_status()
+        return r.json()
+    except Exception as e:  # noqa: BLE001
+        log.warning("\u26a0 fetch error %s", e)
+        return None
 
 async def save(conn, payload: Dict):
     sql = """
@@ -26,13 +37,14 @@ async def save(conn, payload: Dict):
     await conn.execute(sql, payload["region"], payload["ts"], payload["g_co2_kwh"])
 
 async def fetch_watttime(region: str) -> Dict:
-    r = requests.get(
+    data = safe_get(
         f"https://api2.watttime.org/v2/index?ba={region}",
         auth=AUTH,
         timeout=10,
     )
-    r.raise_for_status()
-    grams = r.json()["data"][0]["moer"] * 1000  # kg ➜ g
+    if not data:
+        raise RuntimeError("no data")
+    grams = data["data"][0]["moer"] * 1000  # kg ➜ g
     return {"region": region, "ts": dt.datetime.utcnow(), "g_co2_kwh": grams}
 
 async def main() -> None:
@@ -45,7 +57,7 @@ async def main() -> None:
                     await save(conn, payload)
                     print(f"⬆ saved {payload}")
                 except Exception as exc:  # noqa: BLE001
-                    print("⚠ fetch error", exc, file=sys.stderr)
+                    log.warning("fetch error %s", exc)
         await asyncio.sleep(REFRESH_SECS)
 
 if __name__ == "__main__":
