@@ -1,0 +1,13 @@
+name: security
+on: [push, pull_request]
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - run: pip install bandit
+    - run: bandit -r backend/plugins -ll
+    - run: npm audit --omit dev
+    - uses: aquasecurity/trivy-action@v0.14.0
+      with:
+        image-ref: ghcr.io/org/kernel:latest

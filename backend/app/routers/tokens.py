@@ -32,6 +32,7 @@ from fastapi import (
     Request,
     status,
 )
+from fastapi_limiter.depends import RateLimiter
 from fastapi_pagination import Page, Params, paginate
 from passlib.hash import bcrypt
 from prometheus_client import Counter
@@ -76,7 +77,7 @@ async def verify_project_token(
 
 # ────────── CRUD endpoints ──────────
 @limiter.limit("30/minute")                     # ← *outermost* for SlowAPI
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("/", status_code=status.HTTP_201_CREATED, dependencies=[Depends(RateLimiter(times=60, seconds=60))])
 async def create_token(
     name: str,
     request: Request,                           # noqa: D401  (SlowAPI needs it)

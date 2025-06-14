@@ -105,8 +105,15 @@ class ProjectToken(SQLModel, table=True):
     def verify(raw: str, hashed: str) -> bool:  # noqa: D401
         return bcrypt.verify(raw, hashed)
 
+
+# ─────────────────── DSAR deletion log ───────────────────────
+class DSARLog(SQLModel, table=True):
+    id: int | None = Field(primary_key=True)
+    user_id: int
+    ts: datetime = Field(default_factory=datetime.utcnow)
+
 # ─────────────────── Model rebuilds ───────────────────────────
-for _model in (Sku, CarbonSnapshot, EventType, SavingEvent, ProjectToken):
+for _model in (Sku, CarbonSnapshot, EventType, SavingEvent, ProjectToken, DSARLog):
     try:  # Pydantic v2
         _model.model_rebuild()
     except AttributeError:  # v1 fallback
