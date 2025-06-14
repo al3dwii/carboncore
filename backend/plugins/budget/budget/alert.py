@@ -1,6 +1,7 @@
 import os, requests
 from backend.worker.loader import app
-from app.models import Event, SessionLocal
+from app.models import EventType
+from app.core.deps import SessionLocal
 
 SLACK = os.getenv("SLACK_WEBHOOK")
 
@@ -12,4 +13,4 @@ def overshoot():
         )
         for row in rows:
             requests.post(SLACK, json={"text": f"\u26a0 Budget for project {row.id} nearly exhausted"})
-            Event.create(event_type_id="budget_overshoot", meta={"budget_id": row.id})
+            EventType.create(event_type_id="budget_overshoot", meta={"budget_id": row.id})

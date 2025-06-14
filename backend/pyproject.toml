@@ -8,6 +8,9 @@ authors      = ["You <you@example.com>"]
 # ───────────────────────────── Runtime ─────────────────────────────
 [tool.poetry.dependencies]
 python  = "^3.12"
+qrcode = "^7.4"
+reportlab = "^4.1"      
+
 
 # FastAPI stack
 fastapi  = "^0.111.0"
