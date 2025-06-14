@@ -5,5 +5,6 @@ export const sidebar = [
   { id: "edge-router", sidebar: "Edge Router", icon: "Share2" },
   { id: "budget-copilot", sidebar: "Budget Copilot", icon: "TrendingDown" },
   { id: "green-dev", sidebar: "GreenDev Bot", icon: "Bot" },
+  { id: "supply-pulse", sidebar: "Supply Pulse", icon: "Truck" },
   { id: "eco-label", sidebar: null, icon: undefined },
 ] as const;
