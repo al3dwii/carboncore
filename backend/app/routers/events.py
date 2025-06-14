@@ -38,6 +38,7 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from ..core.deps import get_db
 from ..core.ratelimit import limiter
 from ..models import SavingEvent
+SavingEvent.model_rebuild()
 from .tokens import verify_project_token, ProjectToken  # auth dependency
 
 router = APIRouter(prefix="/events", tags=["events"])

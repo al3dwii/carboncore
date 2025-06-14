@@ -21,7 +21,12 @@ async def save(conn, sku, price, watts):
 async def fetch_aws():
     async with aiohttp.ClientSession() as sess:
         async with sess.get(AWS_PRICE_URL, timeout=60) as r:
-            data = await r.text()
+            if r.status < 400:
+                data = await r.text()
+            else:
+                text = await r.text()
+                print(f"⚠ fetch error {r.status} {text}")
+                return
     doc = json.loads(data)
     for sku, item in doc["products"].items():
         attrs = item["attributes"]

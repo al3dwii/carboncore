@@ -15,21 +15,34 @@ export default function Home(){
 }
 
 
+const API = 'http://127.0.0.1:8000';
+async function waitReady() {
+  for (;;) {
+    try {
+      const r = await fetch(`${API}/health`);
+      if (r.ok) return;
+    } catch {}
+    await new Promise((r) => setTimeout(r, 1000));
+  }
+}
+
 if (typeof window !== "undefined") {
-  fetch("/events?kind=ecs_shift&aggregate=count")
-    .then((r) => r.json())
-    .then(({ count }) => {
-      const s = document.getElementById("shifted");
-      if (s) s.textContent = count;
-    });
-  fetch("/events?field=meta.kg_co2&aggregate=sum")
-    .then((r) => r.json())
-    .then(({ sum }) => {
-      const e = document.getElementById("co2");
-      if (e) e.textContent = (sum || 0).toFixed(1);
-    });
-  fetch("/events?kind=edge_route&aggregate=avg&field=meta.rtt")
-    .then(r=>r.json()).then(({avg})=>{
-      const el=document.getElementById("lat"); if(el) el.textContent=Math.round(avg||0);
-    });
+  waitReady().then(() => {
+    fetch(`${API}/events?kind=ecs_shift&aggregate=count`)
+      .then((r) => r.json())
+      .then(({ count }) => {
+        const s = document.getElementById("shifted");
+        if (s) s.textContent = count;
+      });
+    fetch(`${API}/events?field=meta.kg_co2&aggregate=sum`)
+      .then((r) => r.json())
+      .then(({ sum }) => {
+        const e = document.getElementById("co2");
+        if (e) e.textContent = (sum || 0).toFixed(1);
+      });
+    fetch(`${API}/events?kind=edge_route&aggregate=avg&field=meta.rtt`)
+      .then(r=>r.json()).then(({avg})=>{
+        const el=document.getElementById("lat"); if(el) el.textContent=Math.round(avg||0);
+      });
+  });
 }
