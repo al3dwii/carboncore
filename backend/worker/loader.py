@@ -14,6 +14,21 @@ BROKER_URL  = os.getenv("CELERY_BROKER_URL",  "redis://localhost:6379/0")
 RESULT_BACK = os.getenv("CELERY_RESULT_BACKEND", "redis://localhost:6379/1")
 
 app = Celery("carboncore", broker=BROKER_URL, backend=RESULT_BACK)
+# visibility timeout + DLQ
+app.conf.update(
+  task_acks_late=True,
+  broker_transport_options={"visibility_timeout": 3600},
+  task_default_queue="default",
+  task_default_exchange_type="direct",
+  task_routes={"*_dlq": {"queue": "dead-letter"}},
+)
+
+
+@app.task(name="dlq.rescue", queue="dead-letter")
+def rescue(body, **_):
+    """Handle messages sent to the dead-letter queue."""
+    # log / send to OpsGenie, then maybe re-queue once
+    pass
 # ──────────────────────────────────────────────────────────────────────
 
 # pick up any other Celery-specific options from settings (optional)

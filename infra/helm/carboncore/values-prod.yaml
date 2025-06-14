@@ -1,0 +1,2 @@
+env:
+  OTEL_EXPORTER_OTLP_ENDPOINT: http://grafana-agent:4318

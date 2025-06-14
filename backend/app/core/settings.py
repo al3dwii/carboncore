@@ -16,6 +16,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import ClassVar, Literal
 
+from app.secret import get_secret
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Default to a local SQLite database when no DATABASE_URL is provided so that
@@ -35,6 +37,7 @@ class Settings(BaseSettings):
     # variables in Docker or CI.
     DATABASE_URL: str = os.getenv("DATABASE_URL", DEFAULT_SQLITE)
     REDIS_URL: str = os.getenv("REDIS_URL", "fakeredis://")
+    POSTGRES_PASSWORD: str = get_secret().get("POSTGRES_PASSWORD", "")
 
     @property
     def redis_url(self) -> str:  # noqa: N802 — used by Celery settings

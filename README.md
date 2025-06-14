@@ -19,3 +19,10 @@ docker compose up -d  # brings up DB/Redis/Tempo/backend
 cd web && pnpm i && pnpm dev
 # open http://localhost:3000
 ```
+
+### Install SDKs
+
+```bash
+pip install carboncore-sdk
+pnpm add @carboncore/sdk
+```
