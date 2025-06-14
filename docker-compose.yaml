@@ -110,7 +110,7 @@ services:
         condition: on-failure
 
   grafana-agent:
-    image: grafana/agent:v0.41.2
+    image: grafana/agent:v0.44.2
     command: |
       --metrics.wal-directory=/tmp/agent
       --config.file=/etc/agent.yaml
