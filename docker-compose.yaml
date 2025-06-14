@@ -2,17 +2,28 @@ version: "3.9"
 
 #############################################################
 # docker-compose.yml – CarbonCore full stack
-# (Postgres, Redis, Tempo, FastAPI backend, Celery, Ingestors)
 #############################################################
 
+x-common-env: &common-env
+  DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/carboncore
+  REDIS_URL:     redis://redis:6379/0
+  ELECTRICITYMAPS_TOKEN:   ${ELECTRICITYMAPS_TOKEN:-dummy-token}
+  ELECTRICITYMAPS_API_KEY: ${ELECTRICITYMAPS_API_KEY:-dummy-token}
+  WATTTIME_USERNAME:       ${WATTTIME_USERNAME:-dummy}
+  WATTTIME_PASSWORD:       ${WATTTIME_PASSWORD:-dummy}
+  OTEL_TRACES_EXPORTER:    none                # disable OTEL during local dev
+  PYTHONPATH:              /code/backend       # let plug-ins find local pkgs
+
+# ──────────────────────── data-plane ────────────────────────
 services:
-  # ───────────── data plane ─────────────
   db:
-    image: postgres:16
+    image: postgres:16-alpine
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER:     postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: carboncore
+      POSTGRES_DB:       carboncore
+    volumes:
+      - db_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
@@ -23,7 +34,7 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis:7
+    image: redis:7-alpine
     ports:
       - "6379:6379"
     healthcheck:
@@ -33,9 +44,9 @@ services:
       retries: 5
     restart: unless-stopped
 
-  tempo:                                # OpenTelemetry trace collector
+  tempo:                       # OpenTelemetry trace collector
     image: grafana/tempo:2.7.2
-    command: [ "-config.file=/etc/tempo.yaml" ]
+    command: ["-config.file=/etc/tempo.yaml"]
     volumes:
       - ./docker/tempo/tempo.yaml:/etc/tempo.yaml:ro
     ports:
@@ -43,24 +54,15 @@ services:
       - "4317:4317"   # OTLP / gRPC
     restart: unless-stopped
 
-  # ───────────── compute plane ──────────
+# ──────────────────────── compute-plane ─────────────────────
   backend:
     build:
       context: .
       dockerfile: backend/Dockerfile
     volumes:
-      - ./backend:/code                  # live-reload during dev
-    env_file:
-      - .env.development
-    environment:
-      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/carboncore
-      REDIS_URL: redis://redis:6379/0
-      ELECTRICITYMAPS_TOKEN:  ${ELECTRICITYMAPS_TOKEN:-dummy-token}
-      ELECTRICITYMAPS_API_KEY:  ${ELECTRICITYMAPS_API_KEY:-dummy-token}
-      WATTTIME_USERNAME:      ${WATTTIME_USERNAME:-dummy}
-      WATTTIME_PASSWORD:      ${WATTTIME_PASSWORD:-dummy}
-      OTEL_TRACES_EXPORTER:   none
-      PYTHONPATH:             /code/backend      # lets plugins resolve local pkgs
+      - ./backend:/code              # live-reload during dev
+    env_file: .env.development
+    environment: *common-env
     depends_on:
       db:
         condition: service_healthy
@@ -68,6 +70,11 @@ services:
         condition: service_healthy
       tempo:
         condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     ports:
       - "8000:8000"
     restart: unless-stopped
@@ -76,23 +83,16 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    command: celery -A app.tasks.worker:celery_app worker -B --loglevel=info
+    command: >
+      celery -A app.tasks.worker:celery_app
+      worker -B --loglevel=info
     volumes:
       - ./backend:/code
-    env_file:
-      - .env.development
-    environment:
-      DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/carboncore
-      REDIS_URL: redis://redis:6379/0
-      ELECTRICITYMAPS_TOKEN:   ${ELECTRICITYMAPS_TOKEN:-dummy-token}
-      ELECTRICITYMAPS_API_KEY: ${ELECTRICITYMAPS_API_KEY:-dummy-token}
-      WATTTIME_USERNAME:       ${WATTTIME_USERNAME:-dummy}
-      WATTTIME_PASSWORD:       ${WATTTIME_PASSWORD:-dummy}
-      OTEL_TRACES_EXPORTER:   none
-      PYTHONPATH:             /code/backend
+    env_file: .env.development
+    environment: *common-env
     depends_on:
       backend:
-        condition: service_started
+        condition: service_healthy
       redis:
         condition: service_healthy
     restart: unless-stopped
@@ -130,19 +130,23 @@ services:
       - ./docker/agent.yaml:/etc/agent.yaml
     restart: unless-stopped
 
-# ─────────── optional front-end ───────────
-#  web:
-#    build:
-#      context: .
-#      dockerfile: web/Dockerfile
-#    command: pnpm dev --port 3000
-#    volumes:
-#      - ./web:/app
-#    depends_on:
-#      backend:
-#        condition: service_started
-#    ports:
-#      - "3000:3000"
+  # web:
+  # build:
+  #   context: ./web          # <── change here
+  #   dockerfile: Dockerfile  # (web/Dockerfile stays the same)
+  # command: pnpm dev --port 3000
+  # volumes:
+  #   - ./web:/app
+  # depends_on:
+  #   backend:
+  #     condition: service_started
+  # ports:
+  #   - "3000:3000"
+  # environment:
+  #   NEXT_PUBLIC_API_URL: http://localhost:8000
+
+volumes:
+  db_data:
 
 networks:
   default:

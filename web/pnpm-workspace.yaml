@@ -1,0 +1,3 @@
+ignoredBuiltDependencies:
+  - '@module-federation/nextjs-mf'
+  - esbuild
