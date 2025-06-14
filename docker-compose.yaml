@@ -1,4 +1,3 @@
-version: "3.9"
 
 #############################################################
 # docker-compose.yml – CarbonCore full stack
@@ -57,7 +56,7 @@ services:
 # ──────────────────────── compute-plane ─────────────────────
   backend:
     build:
-      context: .
+      context: ${PWD}
       dockerfile: backend/Dockerfile
     volumes:
       - ./backend:/code              # live-reload during dev
@@ -81,7 +80,7 @@ services:
 
   celery:
     build:
-      context: .
+      context: ${PWD}
       dockerfile: backend/Dockerfile
     command: >
       celery -A app.tasks.worker:celery_app
@@ -99,7 +98,7 @@ services:
 
   grid-ingestor:
     build:
-      context: .
+      context: ${PWD}
       dockerfile: docker/ingestor.Dockerfile
     environment:
       PG_DSN:  postgresql://postgres:postgres@db:5432/carboncore
@@ -111,7 +110,7 @@ services:
 
   sku-crawler:
     build:
-      context: .
+      context: ${PWD}
       dockerfile: docker/ingestor.Dockerfile
     command: python -m ingestion.sku_crawler
     environment:
@@ -132,7 +131,7 @@ services:
 
   # web:
   # build:
-  #   context: ./web          # <── change here
+  #   context: ${PWD}/web          # <── change here
   #   dockerfile: Dockerfile  # (web/Dockerfile stays the same)
   # command: pnpm dev --port 3000
   # volumes:
