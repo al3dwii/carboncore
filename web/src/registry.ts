@@ -43,6 +43,12 @@ export const registry = [
     routes:[{component: "GreenDevPage", path: "/tool/greendev", id: "green-dev"}]
   }
   ,{
+    id: "supply-pulse",
+    sidebar: "Supply Pulse",
+    icon: "Truck",
+    routes:[{component: "PulsePage", path: "/tool/pulse", id: "supply-pulse"}]
+  }
+  ,{
     id: "eco-label",
     sidebar: null,
     routes:[]
