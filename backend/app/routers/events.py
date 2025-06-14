@@ -17,6 +17,7 @@ from __future__ import annotations
 import hashlib
 from datetime import datetime
 from typing import List, Sequence
+from pydantic import BaseModel
 from uuid import UUID, uuid4
 
 import structlog
@@ -38,7 +39,18 @@ from sqlmodel.ext.asyncio.session import AsyncSession
 from ..core.deps import get_db
 from ..core.ratelimit import limiter
 from ..models import SavingEvent
-SavingEvent.model_rebuild()
+
+# Wrapper to avoid forward-ref issues when FastAPI builds the OpenAPI schema
+class SavingEventList(BaseModel):
+    __root__: list[SavingEvent]
+
+try:  # Pydantic v2
+    SavingEventList.model_rebuild()
+    SavingEvent.model_rebuild()
+except AttributeError:  # v1 fallback
+    SavingEventList.update_forward_refs()
+    SavingEvent.update_forward_refs()
+
 from .tokens import verify_project_token, ProjectToken  # auth dependency
 
 router = APIRouter(prefix="/events", tags=["events"])
@@ -113,19 +125,20 @@ async def create_event(
 @limiter.limit("60/minute")
 async def batch_events(
     request: Request,  # noqa: D401
-    payload: List[SavingEvent] = Body(..., description="≤ 5 000 SavingEvent objects"),
+    payload: SavingEventList = Body(..., description="≤ 5 000 SavingEvent objects"),
     db: AsyncSession = Depends(get_db),
     _: ProjectToken = Depends(verify_project_token),
 ):
-    if len(payload) > 5_000:
+    events = payload.__root__
+    if len(events) > 5_000:
         raise HTTPException(400, "batch too large (max 5 000)")
 
     now = datetime.utcnow()
-    for ev in payload:
+    for ev in events:
         ev.created_at = now
         ev.id = UUID(_event_hash(ev)[:32])
 
-    to_insert = await _dedupe(db, payload)
+    to_insert = await _dedupe(db, events)
     if to_insert:
         db.add_all(to_insert)
         await db.commit()
@@ -133,14 +146,14 @@ async def batch_events(
     EVENT_INGEST_CNT.labels("batch", "ok").inc(len(to_insert))
     log.info(
         "event.ingest.batch",
-        received=len(payload),
+        received=len(events),
         inserted=len(to_insert),
-        duplicate=len(payload) - len(to_insert),
+        duplicate=len(events) - len(to_insert),
     )
     return {
-        "received": len(payload),
+        "received": len(events),
         "inserted": len(to_insert),
-        "duplicate": len(payload) - len(to_insert),
+        "duplicate": len(events) - len(to_insert),
     }
 
 

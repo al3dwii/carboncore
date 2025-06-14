@@ -4,11 +4,11 @@ const nextConfig = {
   async rewrites() {
     return [
       {
-        source: "/events/:path*",          // API proxy
-        destination: "http://localhost:8000/events/:path*"
-      }
+        source: "/api/:path*",
+        destination: "http://backend:8000/:path*",
+      },
     ];
-  }
+  },
 };
 
 module.exports = nextConfig;

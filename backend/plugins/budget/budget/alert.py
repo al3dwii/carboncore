@@ -1,5 +1,5 @@
 import os, requests
-from backend.worker.loader import app
+from app.tasks.worker import celery_app as app
 from app.models import EventType
 from app.core.deps import SessionLocal
 

@@ -8,3 +8,31 @@ metrics:
         - job_name: api
           static_configs:
             - targets: ['backend:8000']
+logs:
+  configs:
+    - name: default
+      positions:
+        filename: /tmp/positions.yaml
+      scrape_configs:
+        - job_name: python
+          static_configs:
+            - labels:
+                job: backend
+                __path__: /var/log/*.log
+        - job_name: node
+          static_configs:
+            - labels:
+                job: frontend
+                __path__: /var/log/node/*.log
+traces:
+  configs:
+    - name: default
+      receivers:
+        otlp:
+          protocols:
+            http:
+              endpoint: 0.0.0.0:4318
+            grpc:
+              endpoint: 0.0.0.0:4317
+      remote_write:
+        - endpoint: http://tempo:4318

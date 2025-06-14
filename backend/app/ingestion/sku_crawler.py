@@ -3,9 +3,20 @@ Nightly job – grabs price & energy curves from AWS, GCP, Azure.
 Only the AWS part is shown in full; GCP/Azure follow the same pattern.
 """
 import os, json, asyncio, aiohttp, asyncpg, datetime as dt
+import logging
 
 PG_DSN = os.getenv("PG_DSN", "postgresql://core:core@db/core")
 AWS_PRICE_URL = "https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/AmazonEC2/current/us-east-1/index.json"
+log = logging.getLogger(__name__)
+
+async def safe_get(session: aiohttp.ClientSession, url: str, **kw):
+    try:
+        async with session.get(url, **kw) as r:
+            r.raise_for_status()
+            return await r.text()
+    except Exception as e:  # noqa: BLE001
+        log.warning("\u26a0 fetch error %s", e)
+        return None
 
 async def save(conn, sku, price, watts):
     sql = """
@@ -20,13 +31,9 @@ async def save(conn, sku, price, watts):
 
 async def fetch_aws():
     async with aiohttp.ClientSession() as sess:
-        async with sess.get(AWS_PRICE_URL, timeout=60) as r:
-            if r.status < 400:
-                data = await r.text()
-            else:
-                text = await r.text()
-                print(f"⚠ fetch error {r.status} {text}")
-                return
+        data = await safe_get(sess, AWS_PRICE_URL, timeout=60)
+        if not data:
+            return
     doc = json.loads(data)
     for sku, item in doc["products"].items():
         attrs = item["attributes"]
