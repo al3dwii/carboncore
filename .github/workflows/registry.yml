@@ -16,5 +16,13 @@ jobs:
       - run: npm i -g pnpm
       - run: pnpm install --filter web...
       - run: pnpm ts-node web/gen-registry.ts
+      - run: pnpm test -- --coverage --maxWorkers=2
+        working-directory: console
+      - run: grep -E "^Statements.*80" console/coverage/lcov-report/index.html
       - run: pnpm build --filter web...
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-turbo-
       - run: python scripts/check_flags.py
