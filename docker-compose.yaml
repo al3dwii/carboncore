@@ -1,6 +1,8 @@
+version: "3.9"
+
 #############################################################
 # docker-compose.yml – CarbonCore full stack
-# (Postgres, Redis, Tempo, FastAPI backend, Celery, React UI)
+# (Postgres, Redis, Tempo, FastAPI backend, Celery, Ingestors)
 #############################################################
 
 services:
@@ -8,25 +10,38 @@ services:
   db:
     image: postgres:16
     environment:
-      POSTGRES_DB: carboncore
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: carboncore
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
   redis:
     image: redis:7
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
-  tempo:                # OpenTelemetry trace collector
+  tempo:                                # OpenTelemetry trace collector
     image: grafana/tempo:2.7.2
     command: [ "-config.file=/etc/tempo.yaml" ]
     volumes:
       - ./docker/tempo/tempo.yaml:/etc/tempo.yaml:ro
     ports:
-      - "4318:4318"      # OTLP HTTP
-      - "4317:4317"      # OTLP gRPC (optional)
+      - "4318:4318"   # OTLP / HTTP
+      - "4317:4317"   # OTLP / gRPC
+    restart: unless-stopped
 
   # ───────────── compute plane ──────────
   backend:
@@ -36,36 +51,32 @@ services:
     volumes:
       - ./backend:/code                  # live-reload during dev
     env_file:
-      - .env.development                 # user-editable defaults
+      - .env.development
     environment:
-      # core connectivity
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/carboncore
       REDIS_URL: redis://redis:6379/0
-      # live carbon providers
-      # ELECTRICITYMAPS_TOKEN: "Z5NJGQ28hQq28m4NLsvu"
-      # ELECTRICITYMAPS_API_KEY: "Z5NJGQ28hQq28m4NLsvu"
-      # WATTTIME_USERNAME: "carboncore"
-      # WATTTIME_PASSWORD: "Carboncore123!"
-
       ELECTRICITYMAPS_TOKEN:  ${ELECTRICITYMAPS_TOKEN:-dummy-token}
-      ELECTRICITYMAPS_API_KEY: ${ELECTRICITYMAPS_API_KEY:-dummy-token}   # optional, same value
+      ELECTRICITYMAPS_API_KEY:  ${ELECTRICITYMAPS_API_KEY:-dummy-token}
       WATTTIME_USERNAME:      ${WATTTIME_USERNAME:-dummy}
       WATTTIME_PASSWORD:      ${WATTTIME_PASSWORD:-dummy}
-
-      # observability (disable traces locally)
-      OTEL_TRACES_EXPORTER: none
+      OTEL_TRACES_EXPORTER:   none
+      PYTHONPATH:             /code/backend      # lets plugins resolve local pkgs
     depends_on:
-      - db
-      - redis
-      - tempo
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      tempo:
+        condition: service_started
     ports:
       - "8000:8000"
+    restart: unless-stopped
 
   celery:
     build:
       context: .
       dockerfile: backend/Dockerfile
-    command: celery -A app.tasks.worker worker -B --loglevel=info
+    command: celery -A app.tasks.worker:celery_app worker -B --loglevel=info
     volumes:
       - ./backend:/code
     env_file:
@@ -73,31 +84,29 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/carboncore
       REDIS_URL: redis://redis:6379/0
-      # ELECTRICITYMAPS_TOKEN: "Z5NJGQ28hQq28m4NLsvu"
-      # ELECTRICITYMAPS_API_KEY: "Z5NJGQ28hQq28m4NLsvu"
-      # WATTTIME_USERNAME: "carboncore"
-      # WATTTIME_PASSWORD: "Carboncore123!"
-
-      ELECTRICITYMAPS_TOKEN:  ${ELECTRICITYMAPS_TOKEN:-dummy-token}
-      ELECTRICITYMAPS_API_KEY: ${ELECTRICITYMAPS_API_KEY:-dummy-token}   # optional, same value
-      WATTTIME_USERNAME:      ${WATTTIME_USERNAME:-dummy}
-      WATTTIME_PASSWORD:      ${WATTTIME_PASSWORD:-dummy}
-
-
-      
-      OTEL_TRACES_EXPORTER: none
+      ELECTRICITYMAPS_TOKEN:   ${ELECTRICITYMAPS_TOKEN:-dummy-token}
+      ELECTRICITYMAPS_API_KEY: ${ELECTRICITYMAPS_API_KEY:-dummy-token}
+      WATTTIME_USERNAME:       ${WATTTIME_USERNAME:-dummy}
+      WATTTIME_PASSWORD:       ${WATTTIME_PASSWORD:-dummy}
+      OTEL_TRACES_EXPORTER:   none
+      PYTHONPATH:             /code/backend
     depends_on:
-      - backend
-      - redis
-      - tempo
+      backend:
+        condition: service_started
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
 
   grid-ingestor:
     build:
       context: .
       dockerfile: docker/ingestor.Dockerfile
     environment:
-      - PG_DSN=postgresql://core:core@db/core
-      - REGIONS=EU_DE,EU_FR
+      PG_DSN:  postgresql://postgres:postgres@db:5432/carboncore
+      REGIONS: EU_DE,EU_FR
+    depends_on:
+      db:
+        condition: service_healthy
     restart: unless-stopped
 
   sku-crawler:
@@ -105,27 +114,36 @@ services:
       context: .
       dockerfile: docker/ingestor.Dockerfile
     command: python -m ingestion.sku_crawler
-    deploy:
-      restart_policy:
-        condition: on-failure
+    environment:
+      PG_DSN: postgresql://postgres:postgres@db:5432/carboncore
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: on-failure
 
   grafana-agent:
     image: grafana/agent:v0.44.2
-    command: |
-      --metrics.wal-directory=/tmp/agent
-      --config.file=/etc/agent.yaml
+    command:
+      - --metrics.wal-directory=/tmp/agent
+      - --config.file=/etc/agent.yaml
     volumes:
       - ./docker/agent.yaml:/etc/agent.yaml
+    restart: unless-stopped
 
-  # ─────────── optional front-end ───────────
-  # web:
-  #   build:
-  #     context: .
-  #     dockerfile: web/Dockerfile
-  #   command: pnpm dev --port 3000
-  #   volumes:
-  #     - ./web:/app
-  #   depends_on:
-  #     - backend
-  #   ports:
-  #     - "3000:3000"
+# ─────────── optional front-end ───────────
+#  web:
+#    build:
+#      context: .
+#      dockerfile: web/Dockerfile
+#    command: pnpm dev --port 3000
+#    volumes:
+#      - ./web:/app
+#    depends_on:
+#      backend:
+#        condition: service_started
+#    ports:
+#      - "3000:3000"
+
+networks:
+  default:
+    name: carboncore_default
