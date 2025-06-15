@@ -40,9 +40,12 @@ from ..core.deps import get_db
 from ..core.ratelimit import limiter
 from ..models import SavingEvent
 
+from pydantic import RootModel
+
+class SavingEventList(RootModel[list[SavingEvent]]):
+    pass        # (no extra fields/functions)
+
 # Wrapper to avoid forward-ref issues when FastAPI builds the OpenAPI schema
-class SavingEventList(BaseModel):
-    __root__: list[SavingEvent]
 
 try:  # Pydantic v2
     SavingEventList.model_rebuild()
