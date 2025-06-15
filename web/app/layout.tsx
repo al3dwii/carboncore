@@ -2,6 +2,10 @@ import '@/src/styles/tokens.css';
 import '@/src/styles/globals.css';
 import { ThemeProvider } from 'next-themes';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import BottomNav from '@/src/components/mobile/BottomNav';
+import { initAnalytics, analytics } from '@/src/lib/analytics';
+import { useEffect } from 'react';
+import ConsentBanner from '@/src/components/ConsentBanner';
 
 const client = new QueryClient();
 export const metadata = {
@@ -13,12 +17,20 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  initAnalytics();
+  useEffect(()=>{ analytics.page(window.location.pathname); },[]);
   return (
     <html>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="color-scheme" content="light dark" />
+      </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system">
           <QueryClientProvider client={client}>{children}</QueryClientProvider>
         </ThemeProvider>
+        <BottomNav />
+        <ConsentBanner />
       </body>
     </html>
   );

@@ -26,3 +26,6 @@ cd web && pnpm i && pnpm dev
 pip install carboncore-sdk
 pnpm add @carboncore/sdk
 ```
+
+## Opt-out & privacy
+Analytics require consent via the banner. Set `NEXT_PUBLIC_PH_ENABLED=false` to disable globally.
