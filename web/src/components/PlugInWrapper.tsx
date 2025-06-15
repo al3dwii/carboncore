@@ -1,13 +1,21 @@
-import { ReactNode, useState } from "react";
-import { ErrorBoundary } from "react-error-boundary";
-
-export default function PlugInWrapper({ id, children }: { id: string; children: ReactNode }) {
-  const [offline, setOffline] = useState(false);
-  if (offline) {
-    return <div className="p-4 text-gray-500 bg-gray-100 rounded">Plug-in offline</div>;
-  }
+'use client';
+import { ErrorBoundary } from 'react-error-boundary';
+import { Badge } from '@/components/ui/badge';
+export function PlugInWrapper({
+  id,
+  children,
+}: {
+  id: string;
+  children: React.ReactNode;
+}) {
   return (
-    <ErrorBoundary fallback={<div>Plug-in offline</div>} onError={() => setOffline(true)}>
+    <ErrorBoundary
+      fallback={
+        <Badge variant="destructive" className="m-4">
+          {id} offline
+        </Badge>
+      }
+    >
       {children}
     </ErrorBoundary>
   );

@@ -1,0 +1,13 @@
+:root {
+  /* light theme */
+  --cc-bg: #f9f9f9;
+  --cc-fg: #111111;
+  --cc-green: #22c55e;
+  --cc-surface: #ffffff;
+}
+.dark {
+  --cc-bg: #111111;
+  --cc-fg: #f3f3f3;
+  --cc-green: #22c55e;
+  --cc-surface: #1e1e1e;
+}
