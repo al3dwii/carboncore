@@ -24,6 +24,7 @@ requests = "^2.32.3"
 
 # API helpers
 fastapi-pagination = "^0.12.12"
+fastapi-limiter    = "^0.1.6"
 slowapi            = "^0.1.9"
 tenacity           = "^8.3.0"
 
