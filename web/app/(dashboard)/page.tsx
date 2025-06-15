@@ -1,5 +1,5 @@
 'use client';
-import KpiTile from '@/src/components/KpiTile';
+import KpiTile from '@/components/KpiTile';
 import { useStats } from '@/hooks/useStats';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,

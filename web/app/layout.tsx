@@ -1,11 +1,11 @@
-import '@/src/styles/tokens.css';
-import '@/src/styles/globals.css';
+import '@/styles/tokens.css';
+import '@/styles/globals.css';
 import { ThemeProvider } from 'next-themes';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import BottomNav from '@/src/components/mobile/BottomNav';
-import { initAnalytics, analytics } from '@/src/lib/analytics';
+import BottomNav from '@/components/mobile/BottomNav';
+import { initAnalytics, analytics } from '@/lib/analytics';
 import { useEffect } from 'react';
-import ConsentBanner from '@/src/components/ConsentBanner';
+import ConsentBanner from '@/components/ConsentBanner';
 
 const client = new QueryClient();
 export const metadata = {
