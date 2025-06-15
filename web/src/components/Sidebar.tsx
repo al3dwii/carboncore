@@ -3,7 +3,10 @@ import { Icon } from '@/components/Icon';
 import { useLDClient } from 'launchdarkly-react-client-sdk';
 const items = [
   { id: 'dashboard', label: 'Dashboard', icon: 'BarChart3', href: '/' },
+  { id: 'projects', label: 'Projects', icon: 'FolderGit2', href: '/projects' },
   { id: 'ledger', label: 'Ledger', icon: 'List', href: '/ledger' },
+  { id: 'policies', label: 'Policies', icon: 'Shield', href: '/policies' },
+  { id: 'billing', label: 'Billing', icon: 'CreditCard', href: '/billing' },
   { id: 'eco-shift', label: 'EcoShift', icon: 'Leaf', href: '/eco-shift' },
 ];
 export function Sidebar() {
