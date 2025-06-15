@@ -16,7 +16,7 @@ from importlib import import_module
 from typing import TYPE_CHECKING
 
 from celery import Celery, current_app
-from app.registry import REGISTRY
+from app.registry import registry as REGISTRY
 
 # ───────────────────────── Back-compat module aliases ────────────────────────
 # ➊ Map fictitious package ``backend`` → real ``app`` package

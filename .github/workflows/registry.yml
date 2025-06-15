@@ -19,6 +19,7 @@ jobs:
       - run: pnpm test -- --coverage --maxWorkers=2
         working-directory: console
       - run: grep -E "^Statements.*80" console/coverage/lcov-report/index.html
+      - run: grep -E "^Statements.*80" console/coverage/lcov-report/text-summary.txt
       - run: pnpm build --filter web...
       - uses: actions/cache@v4
         with:
