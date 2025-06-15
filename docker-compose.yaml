@@ -61,7 +61,11 @@ services:
     volumes:
       - ./backend:/code              # live-reload during dev
     env_file: .env.development
-    environment: *common-env
+    environment:
+      <<: *common-env
+      SKIP_AWS_SECRETS: "true"
+      POSTGRES_PASSWORD: postgres
+      REDIS_URL: redis://redis:6379/0
     depends_on:
       db:
         condition: service_healthy
@@ -89,7 +93,11 @@ services:
       - ./backend:/code
       - celery_beat:/code/celerybeat-schedule.db
     env_file: .env.development
-    environment: *common-env
+    environment:
+      <<: *common-env
+      SKIP_AWS_SECRETS: "true"
+      POSTGRES_PASSWORD: postgres
+      REDIS_URL: redis://redis:6379/0
     depends_on:
       backend:
         condition: service_healthy
@@ -107,6 +115,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    profiles: ["prod"]
     restart: unless-stopped
 
   sku-crawler:
@@ -119,6 +128,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    profiles: ["prod"]
     restart: on-failure
 
   grafana-agent:
