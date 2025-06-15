@@ -1,5 +1,5 @@
 'use client';
-import { Tile } from '@/components/kpi/Tile';
+import KpiTile from '@/src/components/KpiTile';
 import { useStats } from '@/hooks/useStats';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -17,9 +17,9 @@ export default function Dashboard() {
   return (
     <PageWrapper>
       <h1 className="text-lg font-medium mb-6">Overview</h1>
-      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 mb-10">
+      <div className="flex flex-wrap gap-3 mb-6">
         {tiles.map(t => (
-          <Tile key={t.label} {...t} loading={isLoading} />
+          <KpiTile key={t.label} label={t.label} value={String(t.value)} icon={null} />
         ))}
       </div>
 
@@ -28,7 +28,8 @@ export default function Dashboard() {
           {/* cumulative */}
           <div className="bg-surface rounded-xl p-4">
             <h2 className="text-sm mb-2">Cumulative CO₂ avoided</h2>
-            <ResponsiveContainer width="100%" height={200}>
+            <div className="w-full h-[220px] xs:h-[260px] md:h-[320px]">
+            <ResponsiveContainer width="100%" height="100%">
               <LineChart data={data.trend}>
                 <XAxis dataKey="date" hide />
                 <YAxis hide />
@@ -36,12 +37,14 @@ export default function Dashboard() {
                 <Line type="monotone" dataKey="co2_kg" strokeWidth={2} dot={false} />
               </LineChart>
             </ResponsiveContainer>
+            </div>
           </div>
 
           {/* by tool */}
           <div className="bg-surface rounded-xl p-4">
             <h2 className="text-sm mb-2">Savings by tool</h2>
-            <ResponsiveContainer width="100%" height={200}>
+            <div className="w-full h-[220px] xs:h-[260px] md:h-[320px]">
+            <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data.by_tool}>
                 <XAxis dataKey="tool" />
                 <YAxis />
@@ -49,6 +52,7 @@ export default function Dashboard() {
                 <Bar dataKey="co2_kg" />
               </BarChart>
             </ResponsiveContainer>
+            </div>
           </div>
         </section>
       )}

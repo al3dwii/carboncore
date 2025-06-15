@@ -7,14 +7,17 @@ export default function Layout({ children }:{children:ReactNode}){
       .then(({items})=>{ if(items?.length) localStorage.setItem("overshoot","1");});
   },[]);
   return (
-    <div className="flex">
+    <>
+      <a href="#main" className="sr-only focus:not-sr-only absolute top-2 left-2 z-50 bg-brand text-white p-2 rounded">Skip to content</a>
+      <div className="flex">
       <aside className="w-56 border-r p-4 space-y-2">
         {sidebar.map(s => <a key={s.id} href={'/tool/'+s.id} className="block">{s.sidebar}</a>)}
         <a href="/dpp/sku123" className="block text-xs text-green-600">Generate DPP sample</a>
       </aside>
 {typeof window!=="undefined" && localStorage.getItem("overshoot")=="1" && 
  <div className="bg-yellow-100 p-2 text-sm text-yellow-800">Budget warning in 30 days</div> }
-      <main className="flex-1 p-6">{children}</main>
+      <main id="main" className="flex-1 p-6">{children}</main>
     </div>
+    </>
   );
 }
