@@ -5,20 +5,36 @@
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
-    "start": "next start -p 3000"
+    "start": "next start -p 3000",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "storybook": "storybook dev -p 6006"
   },
   "dependencies": {
+    "@radix-ui/react-switch": "^1.2.5",
+    "autoprefixer": "^10.4.21",
     "glob": "11.0.3",
     "launchdarkly-react-client-sdk": "3.8.1",
+    "lucide-react": "^0.515.0",
     "next": "14.2.3",
+    "postcss": "^8.5.5",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "react-error-boundary": "4.1.2"
+    "react-error-boundary": "4.1.2",
+    "sonner": "^2.0.5",
+    "tailwindcss": "^4.1.10"
   },
   "devDependencies": {
+    "@module-federation/nextjs-mf": "^8.8.31",
     "@playwright/test": "1.53.0",
+    "@storybook/addon-essentials": "^8.6.14",
+    "@storybook/react": "^9.0.9",
     "@types/react": "19.1.8",
+    "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-tailwindcss": "^3.18.0",
     "openapi-typescript": "7.8.0",
+    "prettier": "^3.5.3",
+    "tailwindcss-animate": "^1.0.7",
     "ts-node": "10.9.2"
   },
   "packageManager": "pnpm@10.11.0"

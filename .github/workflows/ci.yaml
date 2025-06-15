@@ -68,3 +68,5 @@ jobs:
         env:
           TWINE_TOKEN: ${{ secrets.TEST_PYPI_TOKEN }}
         run: ./scripts/build_sdk.sh
+      - name: Lint
+        run: pnpm lint --max-warnings 0 --filter console
