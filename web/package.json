@@ -14,6 +14,8 @@
     "openapi:generate": "docker compose exec -T backend curl -s http://localhost:8000/openapi.json | openapi-typescript --stdin --output src/lib/sdk.ts"
   },
   "dependencies": {
+    "@fullcalendar/react": "^6.1.17",
+    "@fullcalendar/timegrid": "^6.1.17",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-checkbox": "^1.3.2",
     "@radix-ui/react-dialog": "^1.1.14",
