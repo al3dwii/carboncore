@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { ReactNode } from "react";
 import { ModeToggle } from "@/components/ui/ModeToggle";
+import { NAV_BY_ROLE } from "@/lib/nav";
+import { getServerSessionWithRole } from "@/lib/auth";
 
-const nav = [
-  { href: "/dashboard", label: "Dashboard", icon: "📊" },
-  { href: "/ledger", label: "Ledger", icon: "📜" }
-];
+export async function AppShell({ children }: { children: ReactNode }) {
+  const session = await getServerSessionWithRole();
+  const role = (session?.user?.role as keyof typeof NAV_BY_ROLE) || "developer";
+  const nav = NAV_BY_ROLE[role];
 
-export function AppShell({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen bg-cc-base text-white">
       {/* Side-nav */}
