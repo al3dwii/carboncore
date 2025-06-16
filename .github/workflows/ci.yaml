@@ -1,8 +1,8 @@
 name: ci
 on: [push, pull_request]
 
-jobs:
-  test:
+  jobs:
+    test:
     runs-on: ubuntu-latest
 
     services:
@@ -77,3 +77,14 @@ jobs:
         with:
           projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
           storybookBuildDir: storybook-static
+
+  e2e:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with: { version: 9, run_install: true }
+      - run: pnpm exec playwright install --with-deps
+      - run: pnpm dev --port 3000 &
+      - run: pnpm exec playwright test

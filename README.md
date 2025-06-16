@@ -20,6 +20,12 @@ cd web && pnpm i && pnpm dev
 # open http://localhost:3000
 ```
 
+### Auth setup
+
+Copy `.env.example` to `.env` and provide `GITHUB_ID`, `GITHUB_SECRET`,
+`NEXTAUTH_URL` and `NEXTAUTH_SECRET` values. Start the dev server and visit
+`/api/auth/signin` to sign in via GitHub.
+
 ### Install SDKs
 
 ```bash
