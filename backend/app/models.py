@@ -112,8 +112,29 @@ class DSARLog(SQLModel, table=True):
     user_id: int
     ts: datetime = Field(default_factory=datetime.utcnow)
 
+
+# ─────────────────── Plugins registry ───────────────────────
+class Plugin(SQLModel, table=True):
+    __tablename__ = "plugins"
+
+    id: str = Field(primary_key=True, index=True)
+    name: str
+    version: str
+    created_at: datetime | None = Field(
+        default=None,
+        sa_column_kwargs={"server_default": "now()"},
+    )
+
 # ─────────────────── Model rebuilds ───────────────────────────
-for _model in (Sku, CarbonSnapshot, EventType, SavingEvent, ProjectToken, DSARLog):
+for _model in (
+    Sku,
+    CarbonSnapshot,
+    EventType,
+    SavingEvent,
+    ProjectToken,
+    DSARLog,
+    Plugin,
+):
     try:  # Pydantic v2
         _model.model_rebuild()
     except AttributeError:  # v1 fallback
