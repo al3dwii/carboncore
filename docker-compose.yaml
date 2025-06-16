@@ -17,6 +17,8 @@ services:
     build:
       context: .
       dockerfile: docker/backend.Dockerfile
+    ports:
+       - "8000:8000"
     command: >
       bash -c "
         poetry run alembic upgrade head &&
@@ -28,6 +30,8 @@ services:
     depends_on:
       - db
       - redis
+
+    
 
   celery:
     build:
