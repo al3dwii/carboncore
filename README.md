@@ -29,3 +29,10 @@ pnpm add @carboncore/sdk
 
 ## Opt-out & privacy
 Analytics require consent via the banner. Set `NEXT_PUBLIC_PH_ENABLED=false` to disable globally.
+
+## Seed demo data
+
+```bash
+poetry run python scripts/seed_demo.py
+pnpm --filter ./web dlx ts-node scripts/seed_demo.ts
+```

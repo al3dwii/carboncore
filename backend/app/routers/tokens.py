@@ -37,6 +37,8 @@ from fastapi_pagination import Page, Params, paginate
 from passlib.hash import bcrypt
 from prometheus_client import Counter
 from sqlmodel import select
+
+Params.model_rebuild()
 from sqlmodel.ext.asyncio.session import AsyncSession
 
 from ..core.deps import get_db
