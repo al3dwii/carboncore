@@ -1,7 +1,10 @@
+// web/jsconfig.json
 {
   "compilerOptions": {
+    "baseUrl": ".",          // <— same as tsconfig
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["src/*"]       // <— mirror tsconfig’s alias
     }
-  }
+  },
+  "include": ["src/**/*"]
 }
