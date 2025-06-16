@@ -133,6 +133,14 @@ app.add_middleware(
 
 # ───────────── Plug-in routing ─────────────
 for pm in registry.values():
+    if pm.mount_point:
+        try:
+            module_path, func_name = pm.mount_point.split(":")
+            registrar = getattr(import_module(module_path), func_name)
+            registrar(app)
+            log.info("routes.mounted", plugin=pm.id)
+        except Exception as exc:  # pragma: no cover
+            log.error("routes.mount_failed", plugin=pm.id, err=str(exc))
     for route in pm.routes:
         # Case 1 • Router instance already supplied
         if isinstance(route, APIRouter):

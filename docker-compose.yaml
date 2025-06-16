@@ -1,164 +1,42 @@
-
-#############################################################
-# docker-compose.yml – CarbonCore full stack
-#############################################################
-
-x-common-env: &common-env
-  DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/carboncore
-  REDIS_URL:     redis://redis:6379/0
-  ELECTRICITYMAPS_TOKEN:   ${ELECTRICITYMAPS_TOKEN:-dummy-token}
-  ELECTRICITYMAPS_API_KEY: ${ELECTRICITYMAPS_API_KEY:-dummy-token}
-  WATTTIME_USERNAME:       ${WATTTIME_USERNAME:-dummy}
-  WATTTIME_PASSWORD:       ${WATTTIME_PASSWORD:-dummy}
-  OTEL_TRACES_EXPORTER:    none                # disable OTEL during local dev
-  PYTHONPATH:              /code/backend       # let plug-ins find local pkgs
-
-# ──────────────────────── data-plane ────────────────────────
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:16
     environment:
-      POSTGRES_USER:     postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB:       carboncore
-    volumes:
-      - db_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
+    volumes: ["dbdata:/var/lib/postgresql/data"]
+    ports: ["5432:5432"]
 
   redis:
-    image: redis:7-alpine
-    ports:
-      - "6379:6379"
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
+    image: redis:7
+    ports: ["6379:6379"]
 
-  tempo:                       # OpenTelemetry trace collector
-    image: grafana/tempo:2.7.2
-    command: ["-config.file=/etc/tempo.yaml"]
-    volumes:
-      - ./docker/tempo/tempo.yaml:/etc/tempo.yaml:ro
-    ports:
-      - "4318:4318"   # OTLP / HTTP
-      - "4317:4317"   # OTLP / gRPC
-    restart: unless-stopped
-
-# ──────────────────────── compute-plane ─────────────────────
   backend:
     build:
-      context: ${PWD}
-      dockerfile: backend/Dockerfile
-    volumes:
-      - ./backend:/code              # live-reload during dev
-    env_file: .env.development
-    environment:
-      <<: *common-env
-      SKIP_AWS_SECRETS: "true"
-      POSTGRES_PASSWORD: postgres
-      REDIS_URL: redis://redis:6379/0
-    depends_on:
-      db:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-      tempo:
-        condition: service_started
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:8000/health || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    ports:
-      - "8000:8000"
-    restart: unless-stopped
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    command: ["bash", "docker/entrypoint.sh", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+    volumes: ["./backend:/code"]
+    env_file: .env.dev
+    depends_on: [db, redis]
 
   celery:
     build:
-      context: ${PWD}
-      dockerfile: backend/Dockerfile
-    command: >
-      celery -A app.tasks.worker:celery_app
-      worker -B --loglevel=info
-    volumes:
-      - ./backend:/code
-      - celery_beat:/code/celerybeat-schedule.db
-    env_file: .env.development
-    environment:
-      <<: *common-env
-      SKIP_AWS_SECRETS: "true"
-      POSTGRES_PASSWORD: postgres
-      REDIS_URL: redis://redis:6379/0
-    depends_on:
-      backend:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    restart: unless-stopped
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    command: ["celery", "-A", "app.tasks", "worker", "--loglevel=info"]
+    volumes: ["./backend:/code"]
+    env_file: .env.dev
+    depends_on: [backend, redis]
 
-  grid-ingestor:
+  web:
     build:
-      context: ${PWD}
-      dockerfile: docker/ingestor.Dockerfile
-    environment:
-      PG_DSN:  postgresql://postgres:postgres@db:5432/carboncore
-      REGIONS: EU_DE,EU_FR
-    depends_on:
-      db:
-        condition: service_healthy
-    profiles: ["prod"]
-    restart: unless-stopped
-
-  sku-crawler:
-    build:
-      context: ${PWD}
-      dockerfile: docker/ingestor.Dockerfile
-    command: python -m ingestion.sku_crawler
-    environment:
-      PG_DSN: postgresql://postgres:postgres@db:5432/carboncore
-    depends_on:
-      db:
-        condition: service_healthy
-    profiles: ["prod"]
-    restart: on-failure
-
-  grafana-agent:
-    image: grafana/agent:v0.44.2
-    command:
-      - --metrics.wal-directory=/tmp/agent
-      - --config.file=/etc/agent.yaml
-    volumes:
-      - ./docker/agent.yaml:/etc/agent.yaml
-    restart: unless-stopped
-
-  # web:
-  # build:
-  #   context: ${PWD}/web          # <── change here
-  #   dockerfile: Dockerfile  # (web/Dockerfile stays the same)
-  # command: pnpm dev --port 3000
-  # volumes:
-  #   - ./web:/app
-  # depends_on:
-  #   backend:
-  #     condition: service_started
-  # ports:
-  #   - "3000:3000"
-  # environment:
-  #   NEXT_PUBLIC_API_URL: http://localhost:8000
+      context: ./web
+      dockerfile: Dockerfile
+    command: ["pnpm", "dev", "-p", "3000"]
+    volumes: ["./web:/app"]
+    env_file: ../.env.dev
+    depends_on: [backend]
+    ports: ["3000:3000"]
 
 volumes:
-  db_data:
-  celery_beat:
-
-networks:
-  default:
-    name: carboncore_default
+  dbdata:

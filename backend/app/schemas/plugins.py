@@ -18,4 +18,5 @@ class PluginManifest(BaseModel):
     id: str = Field(pattern=r"^[a-z0-9-]+$")
     event_types: List[str] = []
     routes: List[Route] = []
+    mount_point: str | None = None
     schedules: List[Schedule] = []
