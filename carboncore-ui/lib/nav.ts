@@ -1,6 +1,7 @@
 export const NAV_BY_ROLE = {
   developer: [
     { href: "/dashboard", label: "Dashboard", icon: "📊" },
+    { href: "/router", label: "Router", icon: "🗺" },
     { href: "/ledger", label: "Ledger", icon: "📜" },
     { href: "/scheduler", label: "Scheduler", icon: "⏱" }
   ],
