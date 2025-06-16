@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 test("drag job & see toast", async ({ page }) => {
-  await page.goto("/scheduler");
+  await page.goto("/org/acme/scheduler");
   const event = page.locator(".fc-event").first();
   const box = await event.boundingBox();
   // drag 2 hours later (simplified)
