@@ -34,7 +34,7 @@ services:
       dockerfile: Dockerfile
     command: ["pnpm", "dev", "-p", "3000"]
     volumes: ["./web:/app"]
-    env_file: ../.env.dev
+    env_file: .env.dev
     depends_on: [backend]
     ports: ["3000:3000"]
 
