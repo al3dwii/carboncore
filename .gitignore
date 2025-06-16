@@ -51,3 +51,8 @@ backend/src/
 # plugin build artifacts
 backend/plugins/dist/*.whl
 backend/plugins/dist/*.tar.gz
+
+.npmrc
+
+.pnpm-store/
+web/next.config.js
