@@ -1,10 +1,11 @@
 import { ReactNode } from "react";
 import { ModeToggle } from "@/components/ui/ModeToggle";
+import { OrgSwitcher } from "@/components/org/OrgSwitcher";
 import { NAV_BY_ROLE } from "@/lib/nav";
 import { SideNav } from "./SideNav";
 import { getServerSessionWithRole } from "@/lib/auth";
 
-export async function AppShell({ children }: { children: ReactNode }) {
+export async function AppShell({ children, orgId }: { children: ReactNode; orgId: string }) {
   const session = await getServerSessionWithRole();
   const role = (session?.user?.role as keyof typeof NAV_BY_ROLE) || "developer";
   const nav = NAV_BY_ROLE[role];
@@ -22,6 +23,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
       {/* Main */}
       <div className="flex-1 flex flex-col">
         <header className="h-16 flex items-center justify-end px-6 gap-4 border-b border-white/10">
+          <OrgSwitcher currentId={orgId} />
           <ModeToggle />
         </header>
         <main className="p-6 flex-1">{children}</main>

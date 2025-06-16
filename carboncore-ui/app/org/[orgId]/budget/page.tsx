@@ -6,9 +6,9 @@ import { redirect } from "next/navigation";
 
 export const dynamic = "force-dynamic";
 
-export default async function BudgetPage() {
+export default async function BudgetPage({ params }: { params: { orgId: string } }) {
   const session = await getServerSessionWithRole();
-  if (session?.user.role !== "finops") redirect("/dashboard");
+  if (session?.user.role !== "finops") redirect(`/org/${params.orgId}/dashboard`);
 
   const budget = await fetchBudget();
   return (
