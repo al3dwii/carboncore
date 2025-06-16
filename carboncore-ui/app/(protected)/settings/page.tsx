@@ -1,6 +1,7 @@
 import { SlackForm } from "@/components/settings/SlackForm";
 import { WebhookTable } from "@/components/settings/WebhookTable";
 import { fetchSlackURL, fetchWebhooks } from "@/lib/integrations-api";
+import { FeatureFlagsTable } from "@/components/settings/FeatureFlagsTable";
 
 export const dynamic = "force-dynamic";
 
@@ -18,6 +19,11 @@ export default async function SettingsPage() {
       <div>
         <h2 className="font-semibold mb-2">Webhooks</h2>
         <WebhookTable initial={hooks} />
+      </div>
+
+      <div>
+        <h2 className="font-semibold mb-2">Feature Flags</h2>
+        <FeatureFlagsTable />
       </div>
     </section>
   );

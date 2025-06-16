@@ -1,7 +1,7 @@
-import Link from "next/link";
 import { ReactNode } from "react";
 import { ModeToggle } from "@/components/ui/ModeToggle";
 import { NAV_BY_ROLE } from "@/lib/nav";
+import { SideNav } from "./SideNav";
 import { getServerSessionWithRole } from "@/lib/auth";
 
 export async function AppShell({ children }: { children: ReactNode }) {
@@ -16,18 +16,7 @@ export async function AppShell({ children }: { children: ReactNode }) {
         <div className="h-16 flex items-center justify-center font-bold">
           CarbonCore
         </div>
-        <nav className="px-4 space-y-1">
-          {nav.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="flex items-center gap-3 px-2 py-2 rounded hover:bg-white/10"
-            >
-              <span>{item.icon}</span>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+        <SideNav items={nav} />
       </aside>
 
       {/* Main */}
