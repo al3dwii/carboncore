@@ -70,3 +70,10 @@ jobs:
         run: ./scripts/build_sdk.sh
       - name: Lint
         run: pnpm lint --max-warnings 0 --filter console
+      - run: pnpm test -- --coverage
+      - run: pnpm build-storybook -o storybook-static
+      - name: 'Chromatic'
+        uses: chromaui/action@v1
+        with:
+          projectToken: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          storybookBuildDir: storybook-static
