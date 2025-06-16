@@ -87,16 +87,4 @@ docker-volume/
 .Spotlight-V100
 .Trashes
 
-*.log
-!.env
-.env*
-.DS_Store
-
-# ── IDE files ───────────────────────────────────────────────────────────
-.vscode/
-.idea/
 node_modules/
-
-.npmrc
-
-.pnpm-store/

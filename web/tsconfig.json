@@ -1,41 +1,48 @@
 {
+  // Use the canonical Next.js base config (adds DOM libs, JSX, etc.)
+  // Docs: https://nextjs.org/docs/pages/building-your-application/configuring/typescript#existing-tsconfig
+  // "extends": "next/core-web-vitals",
+
   "compilerOptions": {
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
+    /* ---------------- Core ---------------- */
+    "target": "es2022",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "lib": ["dom", "dom.iterable", "esnext"],
+
+    /* ---------------- Strictness & safety ---------------- */
+    "strict": true,
     "skipLibCheck": true,
-    "strict": false,
+    "forceConsistentCasingInFileNames": true,
     "noEmit": true,
     "incremental": true,
-    "module": "esnext",
-    "esModuleInterop": true,
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
     "isolatedModules": true,
-    "jsx": "preserve",
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "strictNullChecks": true,
+
+    /* ---------------- Interop / tooling ---------------- */
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "jsx": "preserve",
+
+    /* ---------------- Path aliases ---------------- */
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    }
+      "@/*": ["src/*"]
+    },
+
+    /* ---------------- Next.js TS plugin (enables typed-routes, etc.) ---------------- */
+    "plugins": [
+      { "name": "next" }
+    ]
   },
+
+  /* Include compiled types for Next.js and all src files */
   "include": [
     "next-env.d.ts",
     ".next/types/**/*.ts",
     "**/*.ts",
     "**/*.tsx"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "exclude": ["node_modules"]
 }

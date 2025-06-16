@@ -3,40 +3,55 @@ services:
     image: postgres:16
     environment:
       POSTGRES_PASSWORD: postgres
-    volumes: ["dbdata:/var/lib/postgresql/data"]
-    ports: ["5432:5432"]
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
 
   redis:
     image: redis:7
-    ports: ["6379:6379"]
+    ports:
+      - "6379:6379"
 
   backend:
     build:
       context: .
       dockerfile: docker/backend.Dockerfile
-    command: ["bash", "docker/entrypoint.sh", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
-    volumes: ["./backend:/code"]
+    command: >
+      bash -c "
+        poetry run alembic upgrade head &&
+        poetry run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+      "
+    volumes:
+      - ./backend:/code          # live-reload for the API
     env_file: .env.dev
-    depends_on: [db, redis]
+    depends_on:
+      - db
+      - redis
 
   celery:
     build:
       context: .
       dockerfile: docker/backend.Dockerfile
     command: ["celery", "-A", "app.tasks", "worker", "--loglevel=info"]
-    volumes: ["./backend:/code"]
+    volumes:
+      - ./backend:/code
     env_file: .env.dev
-    depends_on: [backend, redis]
+    depends_on:
+      - backend
+      - redis
 
   web:
     build:
       context: ./web
       dockerfile: Dockerfile
     command: ["pnpm", "dev", "-p", "3000"]
-    volumes: ["./web:/app"]
+    # ⬇ NO bind-mounts → the image keeps its own node_modules & store
     env_file: .env.dev
-    depends_on: [backend]
-    ports: ["3000:3000"]
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
 
 volumes:
   dbdata:
