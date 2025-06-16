@@ -1,0 +1,63 @@
+name: CarbonCore CI
+on: [pull_request, push]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pnpm run lint
+
+  type:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pnpm tsc --noEmit
+
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with: { version: 9, run_install: true }
+      - run: pnpm vitest run --coverage
+
+  storybook:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: ./.github/workflows/chromatic.yml
+
+  e2e:
+    needs: unit
+    uses: nick-invision/retry@v2
+    with:
+      timeout_minutes: 15
+      max_attempts: 2
+    secrets: inherit
+    strategy:
+      matrix: { browser: [chromium, webkit] }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v2
+        with: { version: 9, run_install: true }
+      - run: pnpm exec playwright install --with-deps
+      - run: pnpm exec playwright test --project ${{ matrix.browser }}
+
+  perf-a11y:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: pnpm exec lhci autorun
+
+  snyk:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: snyk/actions/node@v3
+        with:
+          command: test
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+# Pull-request must pass: lint, type, unit, storybook, e2e, perf-a11y
