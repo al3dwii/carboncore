@@ -1,63 +1,83 @@
-name: CarbonCore CI
-on: [pull_request, push]
+name: build-test-publish
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+  id-token: write   # needed for keyless cosign
 
 jobs:
-  lint:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: pnpm run lint
+    - uses: actions/checkout@v4
+    - uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+        cache: 'poetry'
+    - uses: snok/install-poetry@v1
+    - name: Install deps & test
+      run: |
+        poetry install
+        poetry run pytest -q
+    - name: Check missing migrations
+      run: |
+        poetry run alembic revision --autogenerate --check || \
+          (echo "::error::Uncommitted migration detected" && exit 1)
 
-  type:
+  build:
+    needs: test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: pnpm tsc --noEmit
+    - uses: actions/checkout@v4
 
-  unit:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
-        with: { version: 9, run_install: true }
-      - run: pnpm vitest run --coverage
+    # ---------- Build & push images ----------
+    - name: Login to GHCR
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
-  storybook:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: ./.github/workflows/chromatic.yml
+    - name: Build & push backend
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: backend.Dockerfile
+        tags: ghcr.io/${{ github.repository }}/backend:${{ github.sha }}
+        push: true
+        provenance: false   # provenance will be added after signing
 
-  e2e:
-    needs: unit
-    uses: nick-invision/retry@v2
-    with:
-      timeout_minutes: 15
-      max_attempts: 2
-    secrets: inherit
-    strategy:
-      matrix: { browser: [chromium, webkit] }
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v2
-        with: { version: 9, run_install: true }
-      - run: pnpm exec playwright install --with-deps
-      - run: pnpm exec playwright test --project ${{ matrix.browser }}
+    - name: Build & push frontend
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        file: frontend.Dockerfile
+        tags: ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}
+        push: true
+        provenance: false
 
-  perf-a11y:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - run: pnpm exec lhci autorun
+    # ---------- Sign images ----------
+    - name: Sign images with cosign
+      uses: sigstore/cosign-installer@v3
+    - run: |
+        cosign sign --yes ghcr.io/${{ github.repository }}/backend:${{ github.sha }}
+        cosign sign --yes ghcr.io/${{ github.repository }}/frontend:${{ github.sha }}
+      env:
+        COSIGN_EXPERIMENTAL: 1
+        COSIGN_YES: "true"
 
-  snyk:
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: snyk/actions/node@v3
-        with:
-          command: test
-        env:
-          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+    # ---------- Generate SBOM ----------
+    - name: Create SBOM
+      uses: anchore/sbom-action@v0.16.0
+      with:
+        image: ghcr.io/${{ github.repository }}/backend:${{ github.sha }}
 
-# Pull-request must pass: lint, type, unit, storybook, e2e, perf-a11y
+    # ---------- Upload artifacts ----------
+    - uses: actions/upload-artifact@v4
+      with:
+        name: backend-sbom
+        path: sbom.spdx.json

@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: carboncore-backend
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/you/carboncore2-config'
+    targetRevision: HEAD
+    path: helmfile
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: carboncore
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

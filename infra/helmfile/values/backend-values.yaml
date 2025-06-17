@@ -1,0 +1,12 @@
+serviceMonitor:
+  enabled: true
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: 8000
+
+resources:
+  limits:
+    cpu: "1"
+    memory: "512Mi"

@@ -1,0 +1,16 @@
+repositories:
+  - name: oci-charts
+    url: oci://ghcr.io/your-org/charts
+
+releases:
+  - name: carboncore-backend
+    chart: oci-charts/carboncore-backend
+    namespace: carboncore
+    values:
+      - values/backend-values.yaml
+
+  - name: carboncore-frontend
+    chart: oci-charts/carboncore-frontend
+    namespace: carboncore
+    values:
+      - values/frontend-values.yaml
