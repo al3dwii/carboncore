@@ -1,0 +1,10 @@
+node_modules
+.pnpm-store
+.next
+
+# frontend bloat
+web/.next
+web/node_modules
+web/.pnpm-store   # if you checked one in
+*.log
+.DS_Store
