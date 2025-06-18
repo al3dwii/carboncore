@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "disable_existing_loggers": false,
+  "handlers": {
+    "default": {
+      "class": "logging.StreamHandler",
+      "formatter": "json"
+    }
+  },
+  "formatters": {
+    "json": {
+      "()": "pythonjsonlogger.jsonlogger.JsonFormatter"
+    }
+  },
+  "root": {
+    "handlers": ["default"],
+    "level": "INFO"
+  }
+}

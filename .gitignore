@@ -20,8 +20,11 @@ docker-volume/
 
 # ── Logs / temp / secrets ───────────────────────────────────────────────
 *.log
-!.env
-.env*
+
+# Never commit real secrets
+.env
+.env.*
+!.env.example
 .DS_Store
 
 # ── IDE files ───────────────────────────────────────────────────────────
@@ -91,8 +94,6 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (commit only if you REALLY mean to)
-/.env*
 
 # Vercel
 .vercel
