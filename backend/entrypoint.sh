@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-poetry run alembic upgrade head      # run once
-exec "$@"                            # hand off to gunicorn/uvicorn
+cd /app/backend               # ← this makes alembic.ini discoverable
+
+echo "Running Alembic migrations…"
+alembic upgrade head
+
+exec "$@"

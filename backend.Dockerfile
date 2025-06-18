@@ -11,6 +11,7 @@ COPY backend/pyproject.toml backend/poetry.lock ./
 RUN pip install "poetry==1.8.*" && poetry config virtualenvs.create false
 RUN poetry lock --no-update
 RUN poetry install --only main --no-interaction --no-root
+RUN pip install gunicorn
 
 ######################## runtime ########################
 FROM python:3.12-slim
@@ -35,7 +36,6 @@ COPY --from=builder /usr/local/bin /usr/local/bin
 # copy source
 COPY backend ./backend
 COPY backend/entrypoint.sh /usr/local/bin/entrypoint.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # expose + health
 EXPOSE 8000
@@ -43,6 +43,4 @@ HEALTHCHECK CMD curl -fs http://localhost:8000/health || exit 1
 
 # production server
 ENTRYPOINT ["gunicorn"]
-CMD ["backend.app.main:app",
-     "-k", "uvicorn.workers.UvicornWorker",
-     "--bind", "0.0.0.0:8000"]
+CMD ["backend.app.main:app", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
