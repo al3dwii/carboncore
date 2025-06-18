@@ -34,8 +34,10 @@ COPY --from=builder /usr/local/lib/python3.12/site-packages \
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 # copy source
-COPY backend ./backend
+COPY backend/ .  
 COPY backend/entrypoint.sh /usr/local/bin/entrypoint.sh
+
+ENV PYTHONPATH="/app"
 
 # expose + health
 EXPOSE 8000
@@ -43,4 +45,4 @@ HEALTHCHECK CMD curl -fs http://localhost:8000/health || exit 1
 
 # production server
 ENTRYPOINT ["gunicorn"]
-CMD ["backend.app.main:app", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
+CMD ["app.main:app", "-k", "uvicorn.workers.UvicornWorker", "--bind", "0.0.0.0:8000"]
