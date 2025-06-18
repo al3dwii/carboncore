@@ -1,10 +1,5 @@
-node_modules
-.pnpm-store
-.next
-
-# frontend bloat
+**/.git
+**/__pycache__
 web/.next
-web/node_modules
-web/.pnpm-store   # if you checked one in
-*.log
-.DS_Store
+frontend/.next
+*.swp

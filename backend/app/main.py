@@ -217,11 +217,7 @@ async def readyz() -> dict[str, str]:
 #     }
 
 # ───────────── Prometheus ─────────────
-if settings.ENABLE_METRICS:
-    Instrumentator().instrument(app).expose(
-        app, endpoint="/metrics", include_in_schema=False, should_gzip=True
-    )
-    log.info("prometheus.enabled")
+Instrumentator().instrument(app).expose(app)
 
 # ───────────── OpenTelemetry ─────────────
 if settings.ENABLE_TRACING:
