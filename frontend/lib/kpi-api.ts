@@ -1,10 +1,6 @@
-export interface Kpi {
-  label: string;
-  value: number;
-}
+import type { KPI } from "@/types/kpi";
+import { request } from "./api";
 
-export async function fetchKpis(): Promise<Kpi[]> {
-  const res = await fetch("/api/kpi", { cache: "no-store" });
-  if (!res.ok) throw new Error("KPI fetch failed");
-  return res.json();
+export async function fetchKpis(orgId: string): Promise<KPI[]> {
+  return request("/org/{orgId}/kpi", "get", { orgId });
 }
