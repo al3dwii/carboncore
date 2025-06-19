@@ -1,8 +1,8 @@
-import { getServerSession } from "next-auth";
-import type { Role } from "@/lib/nav";
+import { auth } from "next-auth";
+import type { Role } from "@/types/role";
 
 export async function getServerSessionWithRole() {
-  const session = (await getServerSession()) as (Awaited<ReturnType<typeof getServerSession>> & {
+  const session = (await auth()) as (Awaited<ReturnType<typeof auth>> & {
     user?: { role?: Role };
   });
   return session;

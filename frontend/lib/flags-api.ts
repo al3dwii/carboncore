@@ -1,8 +1,8 @@
-import { Flag } from "@/types/flag";
+import type { Flag } from "@/types/flag";
+import { request } from "./api";
 
-export async function fetchFlags(): Promise<Flag[]> {
-  const r = await fetch("/api/flags", { cache: "no-store" });
-  return Flag.array().parse(await r.json());
+export async function fetchFlags(orgId: string): Promise<Flag[]> {
+  return request("/org/{orgId}/flags", "get", { orgId });
 }
 
 export async function patchFlag(key: string, enabled: boolean) {
