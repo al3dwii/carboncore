@@ -10,7 +10,9 @@
       ],
       "@/styles/*": [
         "styles/*"
-      ]
+      ],
+      "@/types/*": ["types/*"]      
+
     },
     "lib": [
       "dom",
@@ -32,7 +34,8 @@
       {
         "name": "next"
       }
-    ]
+    ],
+    "strictNullChecks": true
   },
   "include": [
     "next-env.d.ts",
