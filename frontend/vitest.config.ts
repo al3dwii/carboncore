@@ -1,10 +1,8 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from 'vitest/config'
+import { fileURLToPath } from 'url'
+import { URL } from 'url'
 
 export default defineConfig({
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: ['./vitest.setup.ts'],
-    coverage: { reporter: ['text', 'lcov'] }
-  }
-});
+  test: { globals: true, environment: 'jsdom' },
+  resolve: { alias: { '@': fileURLToPath(new URL('./', import.meta.url)) } },
+})
