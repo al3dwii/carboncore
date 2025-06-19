@@ -6,7 +6,7 @@
         "components/*"
       ],
       "@/lib/*": [
-        "src/lib/*"
+        "lib/*"
       ],
       "@/styles/*": [
         "styles/*"

@@ -4,6 +4,7 @@ export const NAV_BY_ROLE: Record<string, NavItem[]> = {
   developer: [
     { href: "/dashboard", label: "Dashboard", icon: "📊" },
     { href: "/router", label: "Router", icon: "🗺", flag: "router" },
+    { href: "/pulse", label: "Pulse", icon: "💓", flag: "pulse" },
     { href: "/ledger", label: "Ledger", icon: "📜" },
     { href: "/scheduler", label: "Scheduler", icon: "⏱", flag: "scheduler" }
   ],
