@@ -1,3 +1,6 @@
 ignoredBuiltDependencies:
   - '@module-federation/nextjs-mf'
+  - '@tailwindcss/oxide'
+  - core-js
   - esbuild
+  - unrs-resolver

@@ -1,17 +1,24 @@
 "use client";
 import { Vendor } from "@/types/vendor";
-import useSWR from "swr";
+import { useEventSource } from "@/lib/useEventSource";
 import { isBreach } from "@/lib/breach-util";
 import { VendorModal } from "./VendorModal";
 import { useState } from "react";
 
-const fetcher = (u: string) => fetch(u).then((r) => r.json());
-
-export function VendorTable() {
-  const { data: vendors = [] } = useSWR<Vendor[]>("/api/vendors", fetcher, {
-    refreshInterval: 3600_000
-  });
+export default function VendorTable({
+  initial,
+  orgId,
+}: {
+  initial: Vendor[];
+  orgId: string;
+}) {
+  const [vendors, setVendors] = useState(initial);
   const [modal, setModal] = useState<Vendor | null>(null);
+
+  useEventSource<Vendor>(
+    `/api/proxy/org/${orgId}/vendors/stream`,
+    (v) => setVendors((r) => [v, ...r])
+  );
 
   return (
     <>

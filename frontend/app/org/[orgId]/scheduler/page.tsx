@@ -1,20 +1,7 @@
-import SchedulerCalendar from "@/components/scheduler/Calendar";
-import { fetchJobs } from "@/lib/jobs-api";
-import { startOfWeek, endOfWeek } from "date-fns";
+import SchedulerView from "@/components/scheduler/SchedulerView";
+import { request } from "@/lib/api";
 
-export const dynamic = "force-dynamic";
-
-export default async function SchedulerPage() {
-  const now = new Date();
-  const jobs = await fetchJobs(
-    startOfWeek(now, { weekStartsOn: 1 }).toISOString(),
-    endOfWeek(now, { weekStartsOn: 1 }).toISOString()
-  );
-
-  return (
-    <section>
-      <h1 className="text-2xl font-bold mb-4">EcoShift Scheduler</h1>
-      <SchedulerCalendar jobs={jobs} />
-    </section>
-  );
+export default async function SchedulerPage({ params:{orgId} }) {
+  const data = await request("/org/{orgId}/jobs", "get", { orgId });
+  return <SchedulerView initial={data} orgId={orgId} />;
 }

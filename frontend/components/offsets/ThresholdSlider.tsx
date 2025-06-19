@@ -1,23 +1,37 @@
 "use client";
 import { Slider } from "@/components/ui/Slider";
+import { withAsync } from "@/lib/withAsync";
+import { request } from "@/lib/api";
 import { useState } from "react";
-import { saveThreshold } from "@/lib/offsets-api";
-import { toastSuccess } from "@/lib/toast";
 
-export function ThresholdSlider({ initial }: { initial: number }) {
-  const [v, setV] = useState(initial);
+export default function ThresholdSlider({
+  orgId,
+  initial,
+}: {
+  orgId: string;
+  initial: number;
+}) {
+  const [value, setValue] = useState(initial);
 
-  async function commit([val]: number[]) {
-    setV(val);
-    await saveThreshold(val);
-    toastSuccess("Threshold saved");
-  }
+  const save = (v: number) =>
+    withAsync(
+      () => request("/org/{orgId}/offset-threshold", "patch", { orgId }, { value: v }),
+      "Threshold updated ✅",
+    );
 
   return (
-    <div className="max-w-md">
-      <p className="mb-2 text-sm">Auto-purchase when residual tCO₂ &gt;</p>
-      <Slider defaultValue={[v]} step={1} min={5} max={50} onValueCommit={commit} />
-      <p className="mt-1 text-xs">{v} t CO₂</p>
+    <div className="space-y-2">
+      <p className="text-sm">Purchase offsets when tCO₂e &gt; {value}</p>
+      <Slider
+        min={0}
+        max={5000}
+        step={100}
+        defaultValue={[initial]}
+        onValueCommit={(val) => {
+          setValue(val[0]);
+          save(val[0]);
+        }}
+      />
     </div>
   );
 }
