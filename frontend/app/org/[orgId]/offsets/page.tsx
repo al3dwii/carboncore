@@ -1,17 +1,7 @@
-import { ThresholdSlider } from "@/components/offsets/ThresholdSlider";
-import { NetZeroGauge } from "@/components/offsets/NetZeroGauge";
-import { OffsetLedgerTable } from "@/components/offsets/OffsetLedgerTable";
-import { fetchThreshold, fetchResidual } from "@/lib/offsets-api";
+import OffsetLedger from "@/components/offsets/OffsetLedger";
+import { request }  from "@/lib/api";
 
-export const dynamic = "force-dynamic";
-export default async function OffsetsPage() {
-  const [th, residual] = await Promise.all([fetchThreshold(), fetchResidual()]);
-  return (
-    <section className="space-y-6">
-      <h1 className="text-2xl font-bold">OffsetSync Autopilot</h1>
-      <ThresholdSlider initial={th} />
-      <NetZeroGauge initial={residual} />
-      <OffsetLedgerTable />
-    </section>
-  );
+export default async function Offsets({ params:{orgId} }) {
+  const data = await request("/org/{orgId}/offsets", "get",{orgId});
+  return <OffsetLedger initial={data} orgId={orgId} />;
 }

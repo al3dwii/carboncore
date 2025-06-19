@@ -4,7 +4,7 @@ import { useEventSource } from "@/lib/useEventSource";
 
 export const dynamic = "force-dynamic";
 
-export default async function Dashboard() {
+export default async function Dashboard({ params: { orgId } }: { params: { orgId: string } }) {
   const [kpis, budget] = await Promise.all([fetchKpis(), fetchBudget()]);
   const last = budget.actual[budget.actual.length - 1];
   const remaining = budget.budgetEur - last.eur;

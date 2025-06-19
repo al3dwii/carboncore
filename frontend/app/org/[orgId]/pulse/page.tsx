@@ -1,12 +1,7 @@
-import { VendorTable } from "@/components/pulse/VendorTable";
-import { PulseAlertToasts } from "@/components/pulse/PulseAlertToasts";
+import PulseVendors from "@/components/pulse/VendorTable";
+import { request }  from "@/lib/api";
 
-export default function SupplyCarbonPulsePage() {
-  return (
-    <section className="space-y-6">
-      <h1 className="text-2xl font-bold">SupplyCarbon Pulse</h1>
-      <VendorTable />
-      <PulseAlertToasts />
-    </section>
-  );
+export default async function Pulse({ params:{orgId} }) {
+  const vendors = await request("/org/{orgId}/vendors", "get",{orgId});
+  return <PulseVendors initial={vendors} orgId={orgId} />;
 }
