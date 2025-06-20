@@ -1,4 +1,4 @@
-import { request } from "@/lib/api";
+import { request } from "@/lib/client";
 import { Org } from "@/types/org";
 
 export async function fetchOrgs(): Promise<Org[]> {

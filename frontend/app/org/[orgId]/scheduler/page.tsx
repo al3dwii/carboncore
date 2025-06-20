@@ -1,5 +1,5 @@
 import SchedulerView from "@/components/scheduler/SchedulerView";
-import { request } from "@/lib/api";
+import { request } from "@/lib/client";
 
 export default async function SchedulerPage({ params:{orgId} }) {
   const data = await request("/org/{orgId}/jobs", "get", { orgId });

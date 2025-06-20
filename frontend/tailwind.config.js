@@ -1,17 +1,12 @@
+const { fontFamily } = require("tailwindcss/defaultTheme");
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./app/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}"
-  ],
-  darkMode: "class",
+  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}"],
   theme: {
     extend: {
-      colors: {
-        "cc-base": "#0d1114",
-        "cc-surface": "#1a1f24",
-        muted: "#3b3b3b"
-      }
+      fontFamily: { sans: ["var(--font-inter)", ...fontFamily.sans] },
+      colors: { brand: { DEFAULT: "#28A745", dark: "#1f7e38" } }
     }
   },
   plugins: [require("@tailwindcss/typography")]

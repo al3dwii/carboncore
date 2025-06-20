@@ -1,4 +1,4 @@
-import { request } from "@/lib/api";
+import { request } from "@/lib/client";
 import { LedgerEvent, LedgerEvent as T } from "@/types/ledger";
 
 export async function fetchLedger(limit = 50): Promise<T[]> {

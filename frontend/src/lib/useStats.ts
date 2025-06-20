@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { request } from '@/lib/api';
+import { request } from '@/lib/client';
 
 export function useStats() {
   return useQuery({

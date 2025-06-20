@@ -1,4 +1,4 @@
-import { request } from "@/lib/api";
+import { request } from "@/lib/client";
 import { Vendor } from "@/types/vendor";
 
 export async function fetchVendors(): Promise<Vendor[]> {

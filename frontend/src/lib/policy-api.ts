@@ -1,4 +1,4 @@
-import { request } from "@/lib/api";
+import { request } from "@/lib/client";
 
 export async function fetchPolicy(): Promise<{ weight: number }> {
   return request("/router/policy", "get", {}) as Promise<{ weight: number }>;

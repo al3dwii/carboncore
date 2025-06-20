@@ -1,4 +1,4 @@
-import { request } from "@/lib/api";
+import { request } from "@/lib/client";
 
 export async function generateReport(body: { fy: string }) {
   return request("/reports/generate", "post", {}, body);

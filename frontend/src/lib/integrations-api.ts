@@ -1,4 +1,4 @@
-import { request } from "@/lib/api";
+import { request } from "@/lib/client";
 import { SlackURL, Webhook } from "@/types/integration";
 
 export async function fetchSlackURL(): Promise<string | null> {

@@ -1,5 +1,5 @@
 import useSWR from "swr";
-import { request } from "@/lib/api";
+import { request } from "@/lib/client";
 import { EdgeNode } from "@/types/node";
 
 const fetcher = (path: string) => request(path as any, "get", {}) as Promise<EdgeNode[]>;
