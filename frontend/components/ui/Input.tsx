@@ -13,3 +13,5 @@ export const Input = forwardRef<HTMLInputElement, InputHTMLAttributes<HTMLInputE
     />
   );
 });
+
+export default Input;

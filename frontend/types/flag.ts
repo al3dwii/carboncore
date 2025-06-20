@@ -6,6 +6,7 @@ export type FlagName =
   | "pulse";
 
 export interface Flag {
+  key: string;
   name: FlagName;
   enabled: boolean;
 }

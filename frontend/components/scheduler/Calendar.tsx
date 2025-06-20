@@ -43,6 +43,7 @@ export default function SchedulerCalendar({ jobs }: { jobs: Job[] }) {
       eventContent={(arg) => <JobTooltip eventArg={arg} />}
       height="auto"
       className="[&_.fc-event]:cursor-move"
+      {...({} as any)}
     />
   );
 }

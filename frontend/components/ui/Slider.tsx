@@ -2,11 +2,18 @@
 import { forwardRef } from "react";
 import * as RadixSlider from "@radix-ui/react-slider";
 
-export interface SliderProps extends RadixSlider.SliderProps {}
+export interface SliderProps extends React.ComponentPropsWithoutRef<typeof RadixSlider.Root> {}
 
-export const Slider = forwardRef<HTMLSpanElement, SliderProps>(function Slider(props, ref) {
+export const Slider = forwardRef<
+  React.ElementRef<typeof RadixSlider.Root>,
+  SliderProps
+>(function Slider(props, ref) {
   return (
-    <RadixSlider.Root ref={ref} className="relative flex items-center select-none touch-none w-full h-5" {...props}>
+    <RadixSlider.Root
+      ref={ref}
+      className="relative flex items-center select-none touch-none w-full h-5"
+      {...props}
+    >
       <RadixSlider.Track className="bg-white/20 relative grow rounded-full h-[3px]">
         <RadixSlider.Range className="absolute bg-green-500 rounded-full h-full" />
       </RadixSlider.Track>

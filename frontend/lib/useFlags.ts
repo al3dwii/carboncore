@@ -1,11 +1,11 @@
-"use client";
-import useSWR from "swr";
-import { fetchFlags } from "./flags-api";
-import { useOrg } from "./useOrg";
+import { useQuery } from "@tanstack/react-query";
+import { request } from "./api";
+import type { Flag } from "@/types/flag";
 
-export function useFlags() {
-  const { orgId } = useOrg();
-  const { data: flags = [] } = useSWR(["flags", orgId], () => fetchFlags(orgId));
-  const map = Object.fromEntries(flags.map((f) => [f.key, f.enabled]));
-  return map as Record<string, boolean>;
+export function useFlags(orgId: string) {
+  return useQuery({
+    queryKey: ["flags", orgId],
+    queryFn: () =>
+      request("/org/{orgId}/flags", "get", { orgId }) as Promise<Flag[]>,
+  });
 }

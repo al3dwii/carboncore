@@ -1,6 +1,6 @@
 "use client";
 import { useEventSource } from "@/lib/useEventSource";
-import { LedgerEventSchema } from "@/lib/schemas";
+import { LedgerEventSchema, type LedgerEvent } from "@/lib/schemas";
 import { toastSuccess } from "@/lib/toast";
 import { useState } from "react";
 

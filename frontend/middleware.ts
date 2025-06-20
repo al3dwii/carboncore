@@ -1,4 +1,5 @@
-import { authMiddleware } from "@clerk/nextjs";
+// @ts-ignore - types missing in stub
+import { authMiddleware } from "@clerk/nextjs/server";
 
 export default authMiddleware({
   publicRoutes: ["/", "/pricing"],

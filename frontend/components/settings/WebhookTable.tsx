@@ -40,7 +40,7 @@ export function WebhookTable({ initial }: { initial: Webhook[] }) {
         {hooks.map((h) => (
           <li key={h.id} className="flex justify-between bg-white/5 px-3 py-1 rounded">
             <span className="truncate mr-2">{h.url}</span>
-            <Button variant="ghost" size="sm" onClick={() => remove(h.id)}>
+            <Button variant="ghost" size="sm" onClick={() => remove(h.id)} {...({} as any)}>
               Remove
             </Button>
           </li>

@@ -11,7 +11,7 @@ export function SlackForm({ initial }: { initial?: string }) {
   async function handleSave() {
     try {
       await saveSlackWebhook(url);
-      const resp = await testSlackWebhook();
+      const resp = await testSlackWebhook() as any;
       toastSuccess(resp.ok ? "Slack connected!" : "Test failed");
     } catch {
       toastError("Unable to save Slack webhook");

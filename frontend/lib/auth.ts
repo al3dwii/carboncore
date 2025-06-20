@@ -1,10 +1,7 @@
-import { auth }         from "@clerk/nextjs";
-import type { Role }     from "@/types/role";
+import { auth } from "@clerk/nextjs/server";
 
 export async function getUserWithRole() {
-  const { userId, sessionId, orgId, getToken } = auth();
+  const { userId, getToken } = await auth();
   if (!userId) return null;
-
-  const role: Role = "developer";
-  return { userId, role, getToken };
+  return { userId, role: "developer", getToken };
 }

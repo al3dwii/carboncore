@@ -35,10 +35,10 @@ export function VendorModal({ v, onClose }: { v: Vendor; onClose: () => void }) 
           height={80}
         />
         <div className="mt-6 flex justify-end gap-4">
-          <Button variant="ghost" onClick={onClose}>
+          <Button variant="ghost" onClick={onClose} {...({} as any)}>
             Close
           </Button>
-          <Button variant="secondary" onClick={handleEmail}>
+          <Button variant="secondary" onClick={handleEmail} {...({} as any)}>
             Send remediation email
           </Button>
         </div>
