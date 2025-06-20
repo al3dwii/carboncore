@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { sdk } from '@/lib/sdk';
+import { sdk } from '../lib/sdk';
 
 export function useStats() {
   return useQuery({

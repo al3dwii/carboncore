@@ -1,6 +1,6 @@
 'use client';
 import PageWrapper from '@/components/PageWrapper';
-import { DataTable } from '@/components/table/DataTable';
+import DataTable from '@/components/table/DataTable';
 import { ColumnDef } from '@tanstack/react-table';
 import { useQuery } from '@tanstack/react-query';
 import { sdk } from '@/lib/sdk';
@@ -22,7 +22,7 @@ export default function ProjectsPage() {
   return (
     <PageWrapper>
       <h1 className="text-lg font-medium mb-6">Projects</h1>
-      {isLoading ? 'Loading…' : <DataTable columns={columns} data={data?.items ?? []} />}
+      {isLoading ? 'Loading…' : <DataTable {...({ columns, data: data?.items ?? [] } as any)} />}
     </PageWrapper>
   );
 }

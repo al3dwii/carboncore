@@ -5,8 +5,9 @@ import { useOrg } from "@/lib/useOrg";
 import type { NavItem } from "@/lib/nav";
 
 export function SideNav({ items }: { items: NavItem[] }) {
-  const flags = useFlags();
   const { id } = useOrg();
+  const flagsQuery = useFlags(id);
+  const flags = Object.fromEntries((flagsQuery.data ?? []).map(f => [f.key, f.enabled])) as Record<string, boolean>;
   return (
     <nav className="px-4 space-y-1">
       {items

@@ -844,3 +844,4 @@ export interface operations {
         };
     };
 }
+export const sdk = {} as any;

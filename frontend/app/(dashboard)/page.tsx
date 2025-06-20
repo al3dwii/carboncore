@@ -1,6 +1,6 @@
 'use client';
 import KpiTile from '@/components/KpiTile';
-import { useStats } from '@/hooks/useStats';
+import { useStats } from '../../src/hooks/useStats';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts';
@@ -19,7 +19,7 @@ export default function Dashboard() {
       <h1 className="text-lg font-medium mb-6">Overview</h1>
       <div className="flex flex-wrap gap-3 mb-6">
         {tiles.map(t => (
-          <KpiTile key={t.label} label={t.label} value={String(t.value)} icon={null} />
+          <KpiTile key={t.label} {...(t as any)} />
         ))}
       </div>
 

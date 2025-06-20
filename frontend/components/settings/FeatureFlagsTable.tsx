@@ -1,5 +1,6 @@
 "use client";
 import { useFlags } from "@/lib/useFlags";
+import { useOrg } from "@/lib/useOrg";
 import { patchFlag } from "@/lib/flags-api";
 import { Switch } from "@/components/ui/Switch";
 import { toastSuccess, toastError } from "@/lib/toast";
@@ -11,7 +12,9 @@ const FLAG_META = [
 ] as const;
 
 export function FeatureFlagsTable() {
-  const flags = useFlags();
+  const { id } = useOrg();
+  const { data: flagList = [] } = useFlags(id);
+  const flags = Object.fromEntries(flagList.map(f => [f.key, f.enabled])) as Record<string, boolean>;
 
   async function toggle(key: string, enabled: boolean) {
     try {

@@ -9,7 +9,7 @@ export default function Billing() {
   const { data } = sdk.useEvents__aggregateQuery('month'); // by event_type
   useEffect(() => {
     loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY!).then(s =>
-      setUrl(s.getCheckoutIframeUrl?.() ?? '/stripe/placeholder'),
+      setUrl((s as any).getCheckoutIframeUrl?.() ?? '/stripe/placeholder'),
     );
   }, []);
   return (

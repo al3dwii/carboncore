@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useUser }     from "@clerk/nextjs";
-import { useFlags } from "@/lib/hooks";         // react-query wraps /flags
+import { useFlags } from "@/lib/useFlags";         // react-query wraps /flags
 import { usePathname, useParams } from "next/navigation";
 import { cn } from "./ui";
 

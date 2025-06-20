@@ -2,15 +2,15 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 
 export interface OrgCtxValue {
-  orgId: string;
-  setOrgId: (id: string) => void;
+  id: string;
+  setId: (id: string) => void;
 }
 
 const OrgCtx = createContext<OrgCtxValue | null>(null);
 
 export function OrgProvider({ children, initialOrg }: { children: ReactNode; initialOrg: string }) {
-  const [orgId, setOrgId] = useState(initialOrg);
-  return <OrgCtx.Provider value={{ orgId, setOrgId }}>{children}</OrgCtx.Provider>;
+  const [id, setId] = useState(initialOrg);
+  return <OrgCtx.Provider value={{ id, setId }}>{children}</OrgCtx.Provider>;
 }
 
 export function useOrg() {

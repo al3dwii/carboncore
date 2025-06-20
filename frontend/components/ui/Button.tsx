@@ -13,3 +13,5 @@ export const Button = forwardRef<HTMLButtonElement, ButtonHTMLAttributes<HTMLBut
     />
   );
 });
+
+export default Button;

@@ -9,7 +9,7 @@ export function OrgSwitcher({ currentId }: { currentId: string }) {
   const router = useRouter();
   const path = usePathname();
 
-  const newOrgPath = (id: string) => path.replace(`/org/${currentId}`, `/org/${id}`);
+  const newOrgPath = (id: string) => path!.replace(`/org/${currentId}`, `/org/${id}`);
 
   return (
     <Menu as="div" className="relative">

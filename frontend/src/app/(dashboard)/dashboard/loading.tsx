@@ -1,1 +1,1 @@
-export { default } from '@/ui/SkeletonDashboard'
+export { default } from '../../../../ui/SkeletonDashboard'
