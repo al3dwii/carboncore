@@ -1,6 +1,6 @@
 import { fetchKpis } from "@/lib/kpi-api";
 import { fetchBudget } from "@/lib/budget-api";
-import { useEventSource } from "@/lib/useEventSource";
+import { RemainingBudgetTile } from "./remainingBudget";
 
 export const dynamic = "force-dynamic";
 
@@ -17,19 +17,5 @@ export default async function Dashboard({ params: { orgId } }: { params: { orgId
         </div>
       ))}
     </section>
-  );
-}
-
-/** Client component */
-function RemainingBudgetTile({ initial }: { initial: number }) {
-  "use client";
-  const ev = useEventSource<{ remaining: number }>("/api/budget/stream");
-  const value = ev[0]?.remaining ?? initial;
-  const danger = value < 0;
-  return (
-    <div className={`rounded p-4 ${danger ? "bg-cc-red animate-pulse" : "bg-white/5"}`}>
-      <p className="text-sm">Remaining budget</p>
-      <p className="text-2xl font-mono">{value.toFixed(0)} €</p>
-    </div>
   );
 }

@@ -5,14 +5,15 @@
       "@/components/*": [
         "components/*"
       ],
-      "@/lib/*": [
-        "lib/*"
-      ],
+        "@/lib/*":        ["src/lib/*"],
+      
       "@/styles/*": [
         "styles/*"
       ],
       "@/types/*": ["types/*"],
-      "@/providers": ["providers.tsx"]
+      "@/providers": ["providers.tsx"],
+
+      "@/*": ["src/*"]              
 
     },
     "lib": [
