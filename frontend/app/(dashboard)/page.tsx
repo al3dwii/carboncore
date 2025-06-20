@@ -1,6 +1,6 @@
 'use client';
 import KpiTile from '@/components/KpiTile';
-import { useStats } from '../../src/hooks/useStats';
+import { useStats } from '@/lib/useStats';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
 } from 'recharts';
@@ -8,11 +8,12 @@ import PageWrapper from '@/components/PageWrapper';
 
 export default function Dashboard() {
   const { data, isLoading } = useStats();
+  const d = data as any;
   const tiles = [
-    { label: 'CO₂ avoided (kg)', value: data?.co2_kg?.toLocaleString() },
-    { label: '$ saved', value: '$' + (data?.usd_saved ?? 0).toLocaleString() },
-    { label: 'Active plug-ins', value: data?.plugins ?? 0 },
-    { label: 'PRs analysed', value: data?.prs ?? 0 },
+    { label: 'CO₂ avoided (kg)', value: d?.co2_kg?.toLocaleString() },
+    { label: '$ saved', value: '$' + (d?.usd_saved ?? 0).toLocaleString() },
+    { label: 'Active plug-ins', value: d?.plugins ?? 0 },
+    { label: 'PRs analysed', value: d?.prs ?? 0 },
   ];
   return (
     <PageWrapper>
@@ -23,14 +24,14 @@ export default function Dashboard() {
         ))}
       </div>
 
-      {data && (
+      {d && (
         <section className="grid lg:grid-cols-2 gap-6">
           {/* cumulative */}
           <div className="bg-surface rounded-xl p-4">
             <h2 className="text-sm mb-2">Cumulative CO₂ avoided</h2>
             <div className="w-full h-[220px] xs:h-[260px] md:h-[320px]">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={data.trend}>
+              <LineChart data={d.trend}>
                 <XAxis dataKey="date" hide />
                 <YAxis hide />
                 <Tooltip />
@@ -45,7 +46,7 @@ export default function Dashboard() {
             <h2 className="text-sm mb-2">Savings by tool</h2>
             <div className="w-full h-[220px] xs:h-[260px] md:h-[320px]">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={data.by_tool}>
+              <BarChart data={d.by_tool}>
                 <XAxis dataKey="tool" />
                 <YAxis />
                 <Tooltip />

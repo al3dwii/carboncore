@@ -1,1 +1,1 @@
-export function Skeleton() { return null; }
+export function Skeleton(_: any) { return null; }

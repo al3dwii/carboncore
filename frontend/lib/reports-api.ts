@@ -1,4 +1,4 @@
-import { request, BASE } from "@/lib/api";
+import { request } from "@/lib/api";
 
 export async function generateReport(body: { fy: string }) {
   return request("/reports/generate", "post", {}, body);
@@ -6,7 +6,7 @@ export async function generateReport(body: { fy: string }) {
 
 export async function pollStatus(jobId: string, onProgress: (pct: number) => void) {
   return new Promise<{ files: any[] }>((resolve, reject) => {
-    const es = new EventSource(`${BASE}/reports/stream/${jobId}`);
+    const es = new EventSource(`/api/reports/stream/${jobId}`);
     es.onmessage = (e) => {
       const msg = JSON.parse(e.data);
       onProgress(msg.percent);

@@ -1,4 +1,4 @@
-import { manifest as schema } from "../../src/plugin-schema";
+import { manifest as schema } from "../plugin-schema";
 export const manifest = schema.parse({
   id:"edge-router",
   sidebar:"Edge Router",

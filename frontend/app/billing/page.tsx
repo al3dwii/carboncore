@@ -2,11 +2,10 @@
 import PageWrapper from '@/components/PageWrapper';
 import { loadStripe } from '@stripe/stripe-js';
 import { useEffect, useState } from 'react';
-import { sdk } from '@/lib/sdk';
 
 export default function Billing() {
   const [url, setUrl] = useState<string | null>(null);
-  const { data } = sdk.useEvents__aggregateQuery('month'); // by event_type
+  const data: any[] = [];
   useEffect(() => {
     loadStripe(process.env.NEXT_PUBLIC_STRIPE_KEY!).then(s =>
       setUrl((s as any).getCheckoutIframeUrl?.() ?? '/stripe/placeholder'),

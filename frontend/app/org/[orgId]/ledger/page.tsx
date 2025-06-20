@@ -11,5 +11,5 @@ export default async function LedgerPage({
     "get",
     { orgId }
   );
-  return <LedgerTable initial={events} orgId={orgId} />;
+  return <LedgerTable initial={events as any} orgId={orgId} />;
 }
