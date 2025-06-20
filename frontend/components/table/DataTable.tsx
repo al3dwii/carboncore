@@ -1,1 +1,1 @@
-export default function DataTable() { return null; }
+export function DataTable() { return null }
