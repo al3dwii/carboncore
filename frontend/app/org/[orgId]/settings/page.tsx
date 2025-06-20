@@ -1,5 +1,5 @@
 import SettingsView from "@/components/settings/SettingsView";
-import { request } from "@/lib/api";
+import { request } from "@/lib/client";
 
 export default async function SettingsPage({ params:{orgId} }) {
   const data = await request("/org/{orgId}/settings", "get", { orgId });

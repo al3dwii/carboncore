@@ -1,7 +1,7 @@
 "use client";
 import { Slider } from "@/components/ui/Slider";
 import { withAsync } from "@/lib/withAsync";
-import { request } from "@/lib/api";
+import { request } from "@/lib/client";
 import { useState } from "react";
 
 export default function ThresholdSlider({

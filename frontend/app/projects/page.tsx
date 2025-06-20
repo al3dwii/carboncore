@@ -3,7 +3,7 @@ import PageWrapper from '@/components/PageWrapper';
 import { DataTable } from '@/components/table/DataTable';
 import { ColumnDef } from '@tanstack/react-table';
 import { useQuery } from '@tanstack/react-query';
-import { request } from '@/lib/api';
+import { request } from '@/lib/client';
 
 type Project = any;
 

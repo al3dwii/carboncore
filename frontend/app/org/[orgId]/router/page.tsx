@@ -1,5 +1,5 @@
 import RouterView from "@/components/router/RouterView";
-import { request }  from "@/lib/api";
+import { request }  from "@/lib/client";
 
 export default async function RouterPage({ params:{orgId} }) {
   const data = await request("/org/{orgId}/router", "get",{orgId});

@@ -1,4 +1,4 @@
-import { request } from "@/lib/api";
+import { request } from "@/lib/client";
 import qs from "query-string";
 import type { Job } from "@/types/job";
 

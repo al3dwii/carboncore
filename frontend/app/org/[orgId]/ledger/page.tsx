@@ -1,4 +1,4 @@
-import { request } from "@/lib/api";
+import { request } from "@/lib/client";
 import LedgerTable from "@/components/ledger/Table";
 
 export default async function LedgerPage({

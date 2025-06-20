@@ -1,4 +1,4 @@
-import { request } from "@/lib/api";
+import { request } from "@/lib/client";
 import type { BudgetLine } from "@/types/budget";
 
 export async function fetchBudget(orgId: string): Promise<BudgetLine[]> {

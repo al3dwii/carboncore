@@ -16,7 +16,7 @@ const NAV = [
   { id: "settings",  label: "Settings",  flag: null },
 ];
 
-export default function Sidebar() {
+export default function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
   const pathname = usePathname();
   const { orgId } = useParams() as { orgId: string };
   const { data: flags } = useFlags(orgId);
@@ -24,9 +24,18 @@ export default function Sidebar() {
   if (!isSignedIn) return null;
 
   return (
-    <aside className="w-56 border-r bg-white p-4">
-      <h2 className="mb-6 text-xl font-bold">CarbonCore</h2>
-      <nav className="space-y-2">
+    <>
+      {open && (
+        <div className="fixed inset-0 z-40 lg:hidden" onClick={onClose} />
+      )}
+      <aside
+        className={cn(
+          "fixed z-50 w-56 border-r bg-white p-4 transition-transform lg:static lg:translate-x-0",
+          open ? "translate-x-0" : "-translate-x-full",
+        )}
+      >
+        <h2 className="mb-6 text-xl font-bold">CarbonCore</h2>
+        <nav className="space-y-2">
         {NAV.filter(i => !i.flag || flags?.[i.flag]).map(item => (
           <Link
             key={item.id}
@@ -44,5 +53,6 @@ export default function Sidebar() {
         logged in as {user?.primaryEmailAddress?.emailAddress}
       </div>
     </aside>
+    </>
   );
 }
