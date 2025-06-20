@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
+import { useUser }     from "@clerk/nextjs";
 import { useFlags } from "@/lib/hooks";         // react-query wraps /flags
 import { usePathname, useParams } from "next/navigation";
 import { cn } from "./ui";
@@ -20,7 +20,8 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { orgId } = useParams() as { orgId: string };
   const { data: flags } = useFlags(orgId);
-  const { data: session } = useSession();
+  const { isSignedIn, user } = useUser();
+  if (!isSignedIn) return null;
 
   return (
     <aside className="w-56 border-r bg-white p-4">
@@ -40,7 +41,7 @@ export default function Sidebar() {
         ))}
       </nav>
       <div className="mt-10 text-xs text-gray-500">
-        logged in as {session?.user?.email}
+        logged in as {user?.primaryEmailAddress?.emailAddress}
       </div>
     </aside>
   );

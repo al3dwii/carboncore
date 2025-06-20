@@ -1,5 +1,5 @@
 import { paths }     from "./sdk";
-import { getSession } from "next-auth/react";
+import { cookies } from "next/headers";
 
 const BASE = process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8001";
 
@@ -14,14 +14,7 @@ export async function request<
   params: paths[P][M] extends { parameters: infer Q } ? Q : never,
   body?: paths[P][M] extends { requestBody: infer B } ? B : never,
 ): Promise<ExtractOk<paths[P][M]>> {
-  // ⬇︎ safely attempt to read the client session
-  let token: string | undefined;
-  try {
-    const ses = await getSession();
-    token = (ses as any)?.accessToken;
-  } catch {
-    /* running in RSC — ignore */
-  }
+  const jwt = cookies().get("__session")?.value;
 
   const url = BASE + (path as string).replace(/\{(\w+)\}/g, (_, k) => (params as any)[k])
 
@@ -29,7 +22,7 @@ export async function request<
     method: method.toUpperCase(),
     headers: {
       "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...(jwt ? { Authorization: `Bearer ${jwt}` } : {}),
     },
     body: body ? JSON.stringify(body) : undefined,
     // you may add `cache:"no-store"` if every call should bypass cache

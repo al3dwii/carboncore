@@ -1,14 +1,10 @@
-import { NextRequest, NextResponse } from "next/server";
+import { authMiddleware } from "@clerk/nextjs";
 
-export function middleware(req: NextRequest) {
-  const url = req.nextUrl;
+export default authMiddleware({
+  publicRoutes: ["/", "/pricing"],
+  ignoredRoutes: ["/api/(.*)"],
+});
 
-  if (url.pathname.startsWith("/org/")) return;
-
-  const orgId = req.cookies.get("cc-org")?.value;
-  if (orgId) {
-    url.pathname = `/org/${orgId}${url.pathname}`;
-    return NextResponse.redirect(url);
-  }
-}
-export const config = { matcher: ["/((?!_next|api|favicon.ico).*)"] };
+export const config = {
+  matcher: ["/((?!_next|favicon.ico).*)"],
+};
