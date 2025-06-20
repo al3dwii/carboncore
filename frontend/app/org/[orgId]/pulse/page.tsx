@@ -3,5 +3,5 @@ import { request }  from "@/lib/api";
 
 export default async function Pulse({ params:{orgId} }) {
   const vendors = await request("/org/{orgId}/vendors", "get",{orgId});
-  return <PulseVendors initial={vendors} orgId={orgId} />;
+  return <PulseVendors initial={vendors as any} orgId={orgId} />;
 }

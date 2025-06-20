@@ -12,7 +12,7 @@ export function ReportWizard() {
   const [files, setFiles] = useState<{ fmt: string; url: string; md5: string }[]>([]);
 
   async function handleGenerate() {
-    const { jobId } = await generateReport({ fy });
+    const { jobId } = (await generateReport({ fy }) as any);
     setJobId(jobId);
     setStep(2);
     const done = await pollStatus(jobId, (pct) => setProgress(pct));

@@ -1,11 +1,11 @@
 'use client';
 import PageWrapper from '@/components/PageWrapper';
-import DataTable from '@/components/table/DataTable';
+import { DataTable } from '@/components/table/DataTable';
 import { ColumnDef } from '@tanstack/react-table';
 import { useQuery } from '@tanstack/react-query';
-import { sdk } from '@/lib/sdk';
+import { request } from '@/lib/api';
 
-type Project = Awaited<ReturnType<typeof sdk.projects__list>>['items'][number];
+type Project = any;
 
 const columns: ColumnDef<Project>[] = [
   { header: 'Name', accessorKey: 'name' },
@@ -15,9 +15,9 @@ const columns: ColumnDef<Project>[] = [
 ];
 
 export default function ProjectsPage() {
-  const { data, isLoading } = useQuery({
+  const { data, isLoading } = useQuery<any>({
     queryKey: ['projects'],
-    queryFn: () => sdk.projects__list({ size: 1000 }),
+    queryFn: () => request('/projects', 'get', {} as any),
   });
   return (
     <PageWrapper>

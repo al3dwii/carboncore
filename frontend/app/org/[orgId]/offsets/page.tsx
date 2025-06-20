@@ -3,5 +3,5 @@ import { request }  from "@/lib/api";
 
 export default async function Offsets({ params:{orgId} }) {
   const data = await request("/org/{orgId}/offsets", "get",{orgId});
-  return <OffsetLedger initial={data} orgId={orgId} />;
+  return <OffsetLedger initial={data as any} orgId={orgId} />;
 }
