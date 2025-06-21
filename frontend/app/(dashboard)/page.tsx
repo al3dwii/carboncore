@@ -1,4 +1,4 @@
-import KpiTile from '@/components/kpi/KpiTile';
+import { KpiTile } from '@/components/kpi/KpiTile';
 import AlertBanner from '@/components/AlertBanner';
 import QuickActions from '@/components/QuickActions';
 import PageWrapper from '@/components/PageWrapper';

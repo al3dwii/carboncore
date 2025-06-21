@@ -1,5 +1,5 @@
-import Providers from "@/providers";
-import AppShell from "@/components/layout/AppShell";
+import { Providers } from "../providers";
+import { AppShell } from "@/components/layout/AppShell";
 import type { ReactNode } from "react";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
