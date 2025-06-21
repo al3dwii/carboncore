@@ -2,7 +2,7 @@ import KpiTile from '@/components/kpi/KpiTile';
 import AlertBanner from '@/components/AlertBanner';
 import QuickActions from '@/components/QuickActions';
 import PageWrapper from '@/components/PageWrapper';
-import { request } from '@/lib/api';
+import { request } from '@/lib/request';
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis,
   ResponsiveContainer, Tooltip

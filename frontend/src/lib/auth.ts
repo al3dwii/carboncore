@@ -1,23 +1,11 @@
-import { currentUser } from '@clerk/nextjs/server';
+// types only – NO server imports here
+export type { Role } from './auth.server';
 
-export type Role = 'ops' | 'analyst' | 'developer';
-export interface Session {
-  id: string;
-  email: string;
-  role: Role;
+/* eslint-disable @typescript-eslint/no-unused-vars */
+export async function getRole() {
+  if (process.env.NODE_ENV !== 'production') {
+    console.warn('getRole() invoked in the browser. Returning "analyst".');
+  }
+  return 'analyst';
 }
-
-export async function getUserWithRole(): Promise<Session | null> {
-  const user = await currentUser();
-  if (!user) return null;
-
-  return {
-    id: user.id,
-    email: user.emailAddresses[0]?.emailAddress ?? '',
-    role: (user.publicMetadata.role as Role) ?? 'developer',
-  };
-}
-
-export async function getRole(): Promise<Role> {
-  return (await getUserWithRole())?.role ?? 'developer';
-}
+export const getUserWithRole = getRole;
