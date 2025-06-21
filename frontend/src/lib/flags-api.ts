@@ -1,8 +1,8 @@
 import type { Flag } from "@/types/flag";
-import { request } from './request';
+import { request } from '@/lib/request';
 
 export async function fetchFlags(orgId: string): Promise<Flag[]> {
-  return request("/org/{orgId}/flags", "get", { orgId }) as Promise<Flag[]>;
+  return request(`/api/org/${orgId}/flags`);
 }
 
 export async function patchFlag(key: string, enabled: boolean) {

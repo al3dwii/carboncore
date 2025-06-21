@@ -1,4 +1,4 @@
-import { request } from '@/lib/request';
+import { fetchKpis } from '@/lib/kpi-api';
 import { getActiveOrgId } from '@/lib/org';
 import { notFound } from 'next/navigation';
 
@@ -11,7 +11,7 @@ export default async function Dashboard({
 }) {
   const orgId = getActiveOrgId(params.orgId);
   if (!orgId) notFound();
-  const kpis = await request(`/api/org/${orgId}/kpi`);
+  const kpis = await fetchKpis(orgId);
 
   return (
     <div className="space-y-6">

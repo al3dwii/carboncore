@@ -4,7 +4,7 @@ export type { Role } from './auth.server';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 export async function getRole() {
   if (process.env.NODE_ENV !== 'production') {
-    console.warn('getRole() invoked in the browser. Returning "analyst".');
+    console.debug('getRole() invoked in the browser. Returning "analyst".');
   }
   return 'analyst';
 }

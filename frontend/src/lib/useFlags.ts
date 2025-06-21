@@ -5,7 +5,6 @@ import type { Flag } from "@/types/flag";
 export function useFlags(orgId: string) {
   return useQuery({
     queryKey: ["flags", orgId],
-    queryFn: () =>
-      request("/org/{orgId}/flags", "get", { orgId }) as Promise<Flag[]>,
+    queryFn: () => request(`/api/org/${orgId}/flags`) as Promise<Flag[]>,
   });
 }

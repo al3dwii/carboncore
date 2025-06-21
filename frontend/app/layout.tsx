@@ -7,7 +7,8 @@ import { Shell } from "@/components/Shell";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
-export const metadata = { title: "CarbonCore Console", viewport: "width=device-width, initial-scale=1" };
+export const metadata = { title: "CarbonCore Console" };
+export const viewport = { width: 1024, initialScale: 1.0 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
