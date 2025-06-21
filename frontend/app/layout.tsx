@@ -1,7 +1,7 @@
 import "./globals.css";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
-import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
+// import { ReactQueryStreamedHydration } from "@tanstack/react-query-next-experimental";
 import { Providers } from "./providers";
 import { Shell } from "@/components/Shell";
 
@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Providers>
             <Shell>{children}</Shell>
           </Providers>
-          <ReactQueryStreamedHydration />
+          {/* <ReactQueryStreamedHydration /> */}
         </body>
       </html>
     </ClerkProvider>
