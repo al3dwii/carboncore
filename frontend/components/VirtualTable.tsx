@@ -1,30 +1,36 @@
-import { FixedSizeList as List, ListChildComponentProps } from 'react-virtualized';
-import clsx from 'clsx';
+'use client';
+
+import { FixedSizeList as List } from 'react-window';
+import AutoSizer from 'react-virtualized-auto-sizer';
+
+export type RowRendererProps = {
+  index: number;
+  style: React.CSSProperties;
+};
 
 export function VirtualTable<T>({
-  rowHeight = 40,
-  height = 600,
-  rowClassName,
-  rowRenderer,
+  height = 400,
+  rowHeight = 32,
   items,
+  renderRow,
 }: {
-  rowHeight?: number;
   height?: number;
-  rowClassName?: (index: number) => string;
-  rowRenderer: (item: T, index: number) => React.ReactNode;
+  rowHeight?: number;
   items: T[];
+  renderRow: (item: T, row: RowRendererProps) => React.ReactNode;
 }) {
   return (
-    <List
-      height={height}
-      rowHeight={rowHeight}
-      rowCount={items.length}
-      width={'100%'}
-      rowRenderer={({ index, key, style }: ListChildComponentProps) => (
-        <div key={key} style={style} className={clsx('px-2', rowClassName?.(index))}>
-          {rowRenderer(items[index], index)}
-        </div>
+    <AutoSizer disableHeight>
+      {({ width }) => (
+        <List
+          width={width}
+          height={height}
+          itemCount={items.length}
+          itemSize={rowHeight}
+        >
+          {({ index, style }) => renderRow(items[index], { index, style })}
+        </List>
       )}
-    />
+    </AutoSizer>
   );
 }
