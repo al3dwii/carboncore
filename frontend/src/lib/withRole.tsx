@@ -1,13 +1,13 @@
-import { getUserWithRole } from './auth';
-import { redirect } from 'next/navigation';
-import React from 'react';
+import { RoleGate } from './RoleGate';
+import { type Role } from './auth';
 
-export function withRole<T>(Component: (props: T) => JSX.Element, role: string) {
-  return async function Wrapped(props: T) {
-    const session = await getUserWithRole();
-    if (session?.role !== role) {
-      redirect('/');
-    }
-    return <Component {...props} />;
+export function withRole<P>(Component: React.ComponentType<P>, ...allow: Role[]) {
+  return function Wrapped(props: P) {
+    return (
+      // @ts-expect-error — RoleGate is async (Server) but we can embed it
+      <RoleGate allow={allow}>
+        <Component {...props} />
+      </RoleGate>
+    );
   };
 }
