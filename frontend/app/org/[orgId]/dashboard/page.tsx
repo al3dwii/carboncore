@@ -1,21 +1,27 @@
-import { fetchKpis } from "@/lib/kpi-api";
-import { fetchBudget } from "@/lib/budget-api";
-import { RemainingBudgetTile } from "./remainingBudget";
+import { fetchKpis } from '@/lib/kpi-api';
+import { getActiveOrgId } from '@/lib/org';
 
-export const dynamic = "force-dynamic";
+export const dynamic = 'force-dynamic';
 
-export default async function Dashboard({ params: { orgId } }: { params: { orgId: string } }) {
-  const [kpis, budget] = await Promise.all([fetchKpis(orgId), fetchBudget(orgId)]);
-  const last = (budget as any).actual[(budget as any).actual.length - 1];
-  const remaining = (budget as any).budgetEur - last.eur;
+export default async function Dashboard({
+  params,
+}: {
+  params: { orgId: string };
+}) {
+  const orgId = getActiveOrgId(params.orgId);
+  const kpis = await fetchKpis(orgId);
+
   return (
-    <section className="grid grid-cols-2 gap-6">
-      <RemainingBudgetTile initial={remaining} />
-      {kpis.map((k) => (
-        <div key={k.label} className="bg-white/5 rounded p-4">
-          {k.label}: {k.value}
-        </div>
-      ))}
-    </section>
+    <div className="space-y-6">
+      <h1 className="font-bold text-lg">Dashboard</h1>
+      <ul className="grid grid-cols-2 gap-4">
+        {kpis.items.map((k: any) => (
+          <li key={k.name} className="border rounded p-4">
+            <p className="text-muted-foreground text-sm">{k.name}</p>
+            <p className="text-2xl font-bold">{k.value}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

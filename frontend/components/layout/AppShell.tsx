@@ -1,34 +1,52 @@
-import { ReactNode } from "react";
-import { ModeToggle } from "@/components/ui/ModeToggle";
-import { OrgSwitcher } from "@/components/org/OrgSwitcher";
-import { NAV_BY_ROLE } from "@/lib/nav";
-import { SideNav } from "./SideNav";
-import { getUserWithRole } from "@/lib/auth";
+import Link from 'next/link';
+import { ReactNode } from 'react';
+import { getUserWithRole, Role } from '@/lib/auth';
 
-export async function AppShell({ children, orgId }: { children: ReactNode; orgId?: string }) {
+const NAV: Record<Role, { href: string; label: string }[]> = {
+  ops: [
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/alerts', label: 'Alerts' },
+    { href: '/events', label: 'Events' },
+  ],
+  analyst: [
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/events', label: 'Events' },
+    { href: '/jobs', label: 'Jobs' },
+  ],
+  developer: [
+    { href: '/dashboard', label: 'Dashboard' },
+    { href: '/jobs', label: 'Jobs' },
+  ],
+};
+
+export async function AppShell({
+  children,
+  orgId = '',
+}: {
+  children: ReactNode;
+  orgId?: string;
+}) {
   const session = await getUserWithRole();
-  const role = (session?.role as keyof typeof NAV_BY_ROLE) || "developer";
-  const nav = NAV_BY_ROLE[role];
+  const role = session?.role ?? 'developer';
 
   return (
-    <div className="flex min-h-screen bg-cc-base text-white">
-      {/* Side-nav */}
-      <aside className="w-56 border-r border-white/10 hidden md:block">
-        <div className="h-16 flex items-center justify-center font-bold">
-          CarbonCore
-        </div>
-        <SideNav items={nav} />
+    <div className="min-h-screen flex">
+      <aside className="w-60 p-4 border-r shrink-0">
+        <h1 className="font-bold mb-4 text-lg">Carbon Core</h1>
+        <nav className="space-y-1">
+          {NAV[role].map(i => (
+            <Link
+              key={i.href}
+              href={orgId ? `/org/${orgId}${i.href}` : i.href}
+              className="block px-2 py-1 rounded hover:bg-muted"
+            >
+              {i.label}
+            </Link>
+          ))}
+        </nav>
       </aside>
 
-      {/* Main */}
-      <div className="flex-1 flex flex-col">
-        <header className="h-16 flex items-center justify-end px-6 gap-4 border-b border-white/10">
-          <OrgSwitcher currentId={orgId ?? ''} />
-          <ModeToggle />
-        </header>
-        <main className="p-6 flex-1">{children}</main>
-      </div>
+      <main className="flex-1 p-6">{children}</main>
     </div>
   );
 }
-export default AppShell;
