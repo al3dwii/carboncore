@@ -7,7 +7,7 @@ BACKEND_PID=$!
 
 # Build web console in background
 (
-  cd web
+  cd frontend
   pnpm build
 ) > /tmp/web-build.log 2>&1 &
 WEB_PID=$!

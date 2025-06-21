@@ -16,7 +16,7 @@ The script starts the backend with `uvicorn` and builds the web console using `p
 
 ```bash
 docker compose up -d  # brings up DB/Redis/Tempo/backend
-cd web && pnpm i && pnpm dev
+cd frontend && pnpm install && pnpm dev
 # open http://localhost:3000
 ```
 
@@ -40,5 +40,5 @@ Analytics require consent via the banner. Set `NEXT_PUBLIC_PH_ENABLED=false` to 
 
 ```bash
 poetry run python scripts/seed_demo.py
-pnpm --filter ./web dlx ts-node scripts/seed_demo.ts
+pnpm --filter ./frontend dlx ts-node scripts/seed_demo.ts
 ```

@@ -14,14 +14,14 @@ jobs:
       - run: pip install -r backend/requirements.txt || pip install -r backend/requirements.txt
       - run: python scripts/gen_registry.py
       - run: npm i -g pnpm
-      - run: pnpm install --filter web...
-      - run: pnpm ts-node web/gen-registry.ts
+      - run: pnpm install --filter frontend...
+      - run: pnpm ts-node frontend/gen-registry.mjs
       - run: pnpm ts-node console/scripts/gen-remotes.ts
       - run: pnpm test -- --coverage --maxWorkers=2
         working-directory: console
       - run: grep -E "^Statements.*80" console/coverage/lcov-report/index.html
       - run: grep -E "^Statements.*80" console/coverage/lcov-report/text-summary.txt
-      - run: pnpm build --filter web...
+      - run: pnpm build --filter frontend...
       - uses: actions/cache@v4
         with:
           path: ~/.cache/turbo

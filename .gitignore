@@ -58,7 +58,6 @@ backend/plugins/dist/*.tar.gz
 .npmrc
 
 .pnpm-store/
-web/next.config.js
 
 
 ###############################################################################

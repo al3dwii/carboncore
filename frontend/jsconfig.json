@@ -1,4 +1,4 @@
-// web/jsconfig.json
+// frontend/jsconfig.json
 {
   "compilerOptions": {
     "baseUrl": ".",          // <— same as tsconfig

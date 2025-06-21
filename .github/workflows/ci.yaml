@@ -46,7 +46,7 @@ on: [push, pull_request]
       - uses: actions/setup-node@v4
         with: {node-version: 20}
       - run: npm i -g ajv-cli
-      - run: ajv validate -s schema/plugin.schema.json -d web/plugins/*/manifest.ts
+      - run: ajv validate -s schema/plugin.schema.json -d frontend/plugins/*/manifest.ts
 
       - name: Trivy SBOM & vuln scan
         uses: aquasecurity/trivy-action@0.22.0

@@ -11,5 +11,5 @@ const ledger = Array.from({ length: 500 }, (_, i) => ({
   co2: faker.number.float({ min: 0.05, max: 3 }),
   usd: faker.number.float({ min: 0.01, max: 1.5 })
 }));
-writeFileSync('web/tests/msw/fixtures/ledger.json', JSON.stringify(ledger, null, 2));
+writeFileSync('frontend/tests/msw/fixtures/ledger.json', JSON.stringify(ledger, null, 2));
 console.log('Seed data written.');

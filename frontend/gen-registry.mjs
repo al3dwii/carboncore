@@ -13,7 +13,7 @@ const manifests = glob
 
 const reg =
   "export const registry=" + JSON.stringify(manifests, null, 2) + " as const;";
-fs.writeFileSync("web/src/registry.ts", reg);
+fs.writeFileSync("frontend/src/registry.ts", reg);
 const sidebar =
   "export const sidebar=" +
   JSON.stringify(
@@ -22,5 +22,5 @@ const sidebar =
     2
   ) +
   " as const;";
-fs.writeFileSync("web/src/sidebar-meta.ts", sidebar);
+fs.writeFileSync("frontend/src/sidebar-meta.ts", sidebar);
 console.log("✅ generated console registry");
