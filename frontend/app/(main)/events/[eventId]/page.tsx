@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { request } from '@/lib/api';
+import { request } from '@/lib/request';
 import { Button } from '@/components/ui';
 import { toast } from 'sonner';
 

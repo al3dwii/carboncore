@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { request } from './api'
+import { request } from './request'
 
 export function useUser(id: string) {
   return useQuery({

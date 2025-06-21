@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { qk } from './queryKeys';
-import { request } from './api';
+import { request } from './request';
 
 export function useEvent(id: string) {
   return useQuery({

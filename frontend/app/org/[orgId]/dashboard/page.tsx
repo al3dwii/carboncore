@@ -1,5 +1,6 @@
-import { fetchKpis } from '@/lib/kpi-api';
+import { request } from '@/lib/request';
 import { getActiveOrgId } from '@/lib/org';
+import { notFound } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';
 
@@ -9,7 +10,8 @@ export default async function Dashboard({
   params: { orgId: string };
 }) {
   const orgId = getActiveOrgId(params.orgId);
-  const kpis = await fetchKpis(orgId);
+  if (!orgId) notFound();
+  const kpis = await request(`/api/org/${orgId}/kpi`);
 
   return (
     <div className="space-y-6">

@@ -1,5 +1,5 @@
 import type { Flag } from "@/types/flag";
-import { request } from "./api";
+import { request } from './request';
 
 export async function fetchFlags(orgId: string): Promise<Flag[]> {
   return request("/org/{orgId}/flags", "get", { orgId }) as Promise<Flag[]>;

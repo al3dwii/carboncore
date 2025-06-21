@@ -1,7 +1,8 @@
-'use client';
 import { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
-import { getRole, Role } from './auth';
+import { getRole, Role } from './auth.server';
+
+export const dynamic = 'force-dynamic';
 
 export async function RoleGate({
   allow,

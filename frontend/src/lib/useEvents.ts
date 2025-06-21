@@ -1,6 +1,6 @@
 import { useInfiniteQuery, keepPreviousData } from '@tanstack/react-query';
 import { qk } from './queryKeys';
-import { request } from './api';
+import { request } from './request';
 
 export const getNextPage = (last: { nextCursor?: string }) => last.nextCursor ?? undefined;
 
