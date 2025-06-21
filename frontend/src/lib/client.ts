@@ -21,7 +21,7 @@ type ExtractOk<T> = T extends { responses: { 200: infer R } } ? R : never;
  *  Until the backend OpenAPI spec is reachable we relax `P` to string.
  *  🔁  After you regenerate the SDK replace `Path` with `keyof paths`.
  * ------------------------------------------------------------------- */
-type Path = string;    // ← later: `keyof paths`
+type Path = keyof paths;
 
 /* ------------------------------------------------------------------ */
 /*  runtime constants                                                 */
