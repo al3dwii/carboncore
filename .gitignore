@@ -76,6 +76,8 @@ web/next.config.js
 
 # testing
 /coverage
+.vitest
+.eslintcache
 
 # next.js
 /.next/

@@ -11,7 +11,7 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals"),
-  "plugin:tailwindcss/recommended",
+  ...compat.extends("plugin:tailwindcss/recommended"),
 ];
 
 export default eslintConfig;
