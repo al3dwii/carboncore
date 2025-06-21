@@ -1,10 +1,16 @@
-import { RoleGate } from './RoleGate';
-import { type Role } from './auth';
+'use client';
 
-export function withRole<P>(Component: React.ComponentType<P>, ...allow: Role[]) {
+import React, { ComponentType } from 'react';
+import { RoleGate } from './RoleGate';
+import type { Role } from './auth';
+
+/** HOC that wraps a page/component with a client-side RoleGate. */
+export function withRole<P extends object>(
+  Component: ComponentType<P>,
+  ...allow: Role[]
+): ComponentType<P> {
   return function Wrapped(props: P) {
     return (
-      // @ts-expect-error — RoleGate is async (Server) but we can embed it
       <RoleGate allow={allow}>
         <Component {...props} />
       </RoleGate>
