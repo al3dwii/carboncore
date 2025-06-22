@@ -1,10 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
-import { request } from './request';
-import type { Flag } from "@/types/flag";
 
-export function useFlags(orgId: string) {
+export function useFlags(orgId?: string) {
   return useQuery({
-    queryKey: ["flags", orgId],
-    queryFn: () => request(`/api/org/${orgId}/flags`) as Promise<Flag[]>,
+    queryKey: ["flags", orgId ?? "none"],
+    queryFn: async () => {
+      if (!orgId) return {};               // <-- ⬅ early-return
+      const res = await fetch(`/api/org/${orgId}/flags`);
+      if (!res.ok) throw new Error("flags fetch");
+      return (await res.json()) as Record<string, boolean>;
+    },
+    staleTime: 60_000,
   });
 }
