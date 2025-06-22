@@ -16,6 +16,8 @@ export async function GET(
     scheduler: true,
     budget: true,
     "iac-advisor": true,
+    greendev: true,
+    offsets: true,
   };
   return NextResponse.json(flags);
 }

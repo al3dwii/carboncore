@@ -55,7 +55,7 @@ export default function VendorTable({
           ))}
         </tbody>
       </table>
-      {modal && <VendorModal v={modal} onClose={() => setModal(null)} />}
+      {modal && <VendorModal v={modal} orgId={orgId} onClose={() => setModal(null)} />}
     </>
   );
 }

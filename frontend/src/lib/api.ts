@@ -42,4 +42,5 @@ function req<T>(path: string) {
 
 export const api = {
   recentAdvisor: (n = 20) => req<SavingEvent[]>(`/iac-advisor/recent?limit=${n}`),
+  currentResidual: (orgId: string) => req<{ residual: number }>(`/org/${orgId}/offsets/residual`),
 };

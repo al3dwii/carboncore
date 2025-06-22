@@ -1,5 +1,6 @@
 'use client';
 import type { SavingEvent } from '@/lib/types';
+import { fmtKg, fmtUsd } from '@/lib/format';
 
 export function EventTable({ rows }: { rows: SavingEvent[] }) {
   return (
@@ -18,8 +19,8 @@ export function EventTable({ rows }: { rows: SavingEvent[] }) {
           <tr key={r.id} className="border-t border-white/10">
             <td className="py-2">{r.project_id}</td>
             <td>{r.feature}</td>
-            <td>{r.co2}</td>
-            <td>{r.usd}</td>
+            <td>{fmtKg.format(r.co2)} kg</td>
+            <td>{fmtUsd.format(r.usd)}</td>
             <td>{r.created_at.slice(0, 10)}</td>
           </tr>
         ))}
