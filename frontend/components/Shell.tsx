@@ -1,5 +1,5 @@
 "use client";
-import { Sidebar }   from "./Sidebar";
+import { Sidebar }   from "../src/components/Sidebar";
 import { UserButton } from "@clerk/nextjs";
 
 export function Shell({ children }: { children: React.ReactNode }) {

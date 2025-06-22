@@ -9,7 +9,7 @@ interface JobEvent {
 }
 
 export function JobStreamToasts() {
-  const [evt] = useEventSource<JobEvent>("/api/proxy/jobs/stream", {
+  const [evt] = useEventSource<JobEvent>("/api/proxy/_admin/jobs/stream", {
     reconnect: true,
   });
 

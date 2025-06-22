@@ -1,9 +1,9 @@
 import { Button } from '@/components/ui';
 export default function QuickActions() {
   const actions = [
-    { href: '/events?q=error', label: 'View Errors' },
-    { href: '/alerts', label: 'Open Alerts' },
-    { href: '/jobs', label: 'Job Queue' },
+    { href: '/_admin/events?q=error', label: 'View Errors' },
+    { href: '/_admin/alerts', label: 'Open Alerts' },
+    { href: '/_admin/jobs', label: 'Job Queue' },
   ];
   return (
     <div className="flex gap-3">
