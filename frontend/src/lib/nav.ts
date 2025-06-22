@@ -7,7 +7,8 @@ export const NAV_BY_ROLE: Record<string, NavItem[]> = {
     { href: "/pulse", label: "Pulse", icon: "💓", flag: "pulse" },
     { href: "/ledger", label: "Ledger", icon: "📜" },
     { href: "/scheduler", label: "Scheduler", icon: "⏱", flag: "scheduler" },
-    { href: "/iac-advisor", label: "IaC Advisor", icon: "🛠", flag: "iac-advisor" }
+    { href: "/iac-advisor", label: "IaC Advisor", icon: "🛠", flag: "iac-advisor" },
+    { href: "/greendev", label: "GreenDev Bot", icon: "🤖", flag: "greendev" }
   ],
   finops: [
     { href: "/dashboard", label: "Dashboard", icon: "📊" },
@@ -17,7 +18,8 @@ export const NAV_BY_ROLE: Record<string, NavItem[]> = {
   sustainability: [
     { href: "/dashboard", label: "Dashboard", icon: "📊" },
     { href: "/ledger", label: "Ledger", icon: "📜" },
-    { href: "/reports", label: "Reports", icon: "📄" }
+    { href: "/reports", label: "Reports", icon: "📄" },
+    { href: "/offsets", label: "Offsets", icon: "🌳" }
   ],
   admin: [{ href: "/settings", label: "Settings", icon: "⚙️" }]
 } as const;

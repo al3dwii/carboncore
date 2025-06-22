@@ -24,8 +24,8 @@ describe("<EventTable />", () => {
 
     expect(utils.getByText(row.project_id)).toBeInTheDocument();
     expect(utils.getByText(row.feature)).toBeInTheDocument();
-    expect(utils.getByText("0.25")).toBeInTheDocument(); // USD
-    expect(utils.getByText("0.08")).toBeInTheDocument(); // CO₂
+    expect(utils.getByText(/\$0\.25/)).toBeInTheDocument();
+    expect(utils.getByText("0.08 kg")).toBeInTheDocument();
   });
 
   it("renders **no rows** when rows = []", () => {

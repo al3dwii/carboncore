@@ -9,3 +9,7 @@ export async function fetchVendors(): Promise<Vendor[]> {
 export async function sendRemediationEmail(id: string) {
   await request(`/vendors/${id}/email`, "post", { id } as any);
 }
+
+export async function vendorTrend(orgId: string, vendorId: string) {
+  return request(`/org/${orgId}/vendors/${vendorId}/trend?days=30`, 'get');
+}

@@ -4,13 +4,13 @@ import { OffsetPurchase } from "@/types/offset";
 import { useState, useEffect } from "react";
 
 export default function OffsetLedger({
-  initial,
+  initial = [],
   orgId,
 }: {
-  initial: OffsetPurchase[];
+  initial?: OffsetPurchase[];
   orgId: string;
 }) {
-  const [rows, setRows] = useState<OffsetPurchase[]>(initial ?? []);
+  const [rows, setRows] = useState<OffsetPurchase[]>(initial);
   const [evt] = useEventSource<OffsetPurchase>(
     `/api/proxy/org/${orgId}/offsets/stream`,
     { reconnect: true }

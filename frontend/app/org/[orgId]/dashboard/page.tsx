@@ -1,18 +1,23 @@
 import { fetchKpis } from '@/lib/kpi-api';
 import { getActiveOrgId } from '@/lib/org';
 import { notFound } from 'next/navigation';
+import { Suspense } from 'react';
+import { Loading } from '@/components/Loading';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Dashboard({
-  params,
-}: {
-  params: { orgId: string };
-}) {
-  const orgId = getActiveOrgId(params.orgId);
-  if (!orgId) notFound();
-  const kpis = await fetchKpis(orgId);
+export default function DashboardPage({ params }: { params: { orgId: string } }) {
+  return (
+    <Suspense fallback={<Loading />}>
+      <Content orgId={params.orgId} />
+    </Suspense>
+  );
+}
 
+async function Content({ orgId }: { orgId: string }) {
+  const id = getActiveOrgId(orgId);
+  if (!id) notFound();
+  const kpis = await fetchKpis(id);
   return (
     <div className="space-y-6">
       <h1 className="font-bold text-lg">Dashboard</h1>
