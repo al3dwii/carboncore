@@ -12,7 +12,6 @@
       ],
       "@/types/*": ["types/*"],
       "@/providers": ["providers.tsx"],
-
       "@/*": ["src/*"]              
 
     },

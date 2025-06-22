@@ -1,6 +1,7 @@
 import { api } from "@/lib/api";
 import { EventTable } from "@/components/EventTable";
 
+
 export const revalidate = 60;
 
 export default async function Page() {
