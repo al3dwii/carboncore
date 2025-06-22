@@ -1,6 +1,7 @@
 "use client";
 import { useEventSource } from "@/lib/useEventSource";
 import { toastError } from "@/lib/toast";
+import { useEffect } from "react";
 
 interface AlertEvent {
   vendor: string;
@@ -8,12 +9,16 @@ interface AlertEvent {
 }
 
 export function PulseAlertToasts() {
-  const events = useEventSource<AlertEvent>("/api/vendors/stream");
-  if (events.length > 0) {
-    const e = events[0];
-    if (e.type === "breach") {
-      toastError(`${e.vendor} breached SLA`);
+  const [evt] = useEventSource<AlertEvent>("/api/proxy/vendors/stream", {
+    reconnect: true,
+  });
+
+  useEffect(() => {
+    if (!evt) return;
+    if (evt.type === "breach") {
+      toastError(`${evt.vendor} breached SLA`);
     }
-  }
+  }, [evt]);
+
   return null;
 }

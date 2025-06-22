@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { toastError, toastSuccess } from "@/lib/toast";
 
-export function WebhookTable({ initial }: { initial: Webhook[] }) {
-  const [hooks, setHooks] = useState(initial);
+export function WebhookTable({ initial }: { initial?: Webhook[] }) {
+  const [hooks, setHooks] = useState<Webhook[]>(() => Array.isArray(initial) ? initial : []);
   const [url, setUrl] = useState("");
 
   async function add() {

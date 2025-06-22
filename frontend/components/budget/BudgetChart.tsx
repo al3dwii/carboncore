@@ -6,11 +6,13 @@ import { useEffect, useState } from "react";
 
 export function BudgetChart({ initial }: { initial: BudgetLine }) {
   const [data, setData] = useState(initial);
-  const updates = useEventSource<BudgetLine>("/api/budget/stream");
+  const [evt] = useEventSource<BudgetLine>("/api/proxy/budget/stream", {
+    reconnect: true,
+  });
 
   useEffect(() => {
-    if (updates.length) setData(updates[0]);
-  }, [updates]);
+    if (evt) setData(evt);
+  }, [evt]);
 
   const merged = data.actual.concat(data.forecast);
 

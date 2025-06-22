@@ -1,12 +1,36 @@
 const path = require("path");
 
 /** @type {import('next').NextConfig} */
-module.exports = {
+const withProxyRewrites = {
   webpack(config) {
     config.resolve.alias["@"] = path.resolve(__dirname, "src");
     return config;
   },
+
+  /**
+   * Proxy anything that starts with `/api/proxy/…` to the FastAPI backend
+   * defined in `NEXT_PUBLIC_BACKEND_URL`.
+   *
+   * Works in dev, Docker and Vercel/Netlify because it’s path-rewriting,
+   * not `fetch()`ing in a route handler (so SSE still streams).
+   */
+  async rewrites() {
+    const target =
+      (process.env.NEXT_PUBLIC_BACKEND_URL ?? "http://localhost:8001").replace(
+        /\/$/,
+        ""
+      );
+
+    return [
+      {
+        source: "/api/proxy/:path*",
+        destination: `${target}/:path*`,
+      },
+    ];
+  },
 };
+
+module.exports = withProxyRewrites;
 
 
 // // previous web/next.config.js

@@ -1,7 +1,7 @@
 "use client";
 import { useEventSource } from "@/lib/useEventSource";
 import { OffsetPurchase } from "@/types/offset";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function OffsetLedger({
   initial,
@@ -10,12 +10,15 @@ export default function OffsetLedger({
   initial: OffsetPurchase[];
   orgId: string;
 }) {
-  const [rows, setRows] = useState(initial);
-
-  useEventSource<OffsetPurchase>(
+  const [rows, setRows] = useState<OffsetPurchase[]>(initial ?? []);
+  const [evt] = useEventSource<OffsetPurchase>(
     `/api/proxy/org/${orgId}/offsets/stream`,
-    (e) => setRows((r) => [e, ...r])
+    { reconnect: true }
   );
+
+  useEffect(() => {
+    if (evt) setRows((r) => [evt, ...r]);
+  }, [evt]);
 
   return (
     <table className="w-full text-sm border-collapse">

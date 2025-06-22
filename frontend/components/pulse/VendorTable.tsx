@@ -3,7 +3,7 @@ import { Vendor } from "@/types/vendor";
 import { useEventSource } from "@/lib/useEventSource";
 import { isBreach } from "@/lib/breach-util";
 import { VendorModal } from "./VendorModal";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function VendorTable({
   initial,
@@ -12,13 +12,17 @@ export default function VendorTable({
   initial: Vendor[];
   orgId: string;
 }) {
-  const [vendors, setVendors] = useState(initial);
+  const [vendors, setVendors] = useState<Vendor[]>(initial ?? []);
   const [modal, setModal] = useState<Vendor | null>(null);
 
-  useEventSource<Vendor>(
+  const [evt] = useEventSource<Vendor>(
     `/api/proxy/org/${orgId}/vendors/stream`,
-    (v) => setVendors((r) => [v, ...r])
+    { reconnect: true }
   );
+
+  useEffect(() => {
+    if (evt) setVendors((r) => [evt, ...r]);
+  }, [evt]);
 
   return (
     <>

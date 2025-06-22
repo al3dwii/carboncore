@@ -1,6 +1,7 @@
 "use client";
 import { useEventSource } from "@/lib/useEventSource";
 import { toastError } from "@/lib/toast";
+import { useEffect } from "react";
 
 interface AlertEvent {
   type: string;
@@ -8,13 +9,21 @@ interface AlertEvent {
 }
 
 export function BudgetAlertToasts() {
-  const events = useEventSource<AlertEvent>("/api/budget/stream");
-  if (events.length > 0) {
-    const e = events[0];
-    if (e.type === "budget_overshoot") {
-      toastError(`Budget exceed by €${Math.round(-e.remaining)}`);
-      fetch("/api/integrations/slack/budget", { method: "POST" });
+  const [evt] = useEventSource<AlertEvent>(
+    "/api/proxy/budget/stream",
+    { reconnect: true }
+  );
+
+  useEffect(() => {
+    if (!evt) return;
+    if (evt.type === "budget_overshoot") {
+      toastError(`Budget exceeded by €${Math.round(-evt.remaining)}`);
+      // fire-and-forget side-effect
+      fetch("/api/integrations/slack/budget", { method: "POST" }).catch(
+        console.error
+      );
     }
-  }
+  }, [evt]);
+
   return null;
 }
