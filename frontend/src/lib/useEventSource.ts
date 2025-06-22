@@ -23,12 +23,14 @@ export interface UseEventSourceOpts<T> {
 
 export function useEventSource<T = unknown>(
   url: string,
-  {
+  optsOrCallback: UseEventSourceOpts<T> | ((ev: T) => any) = {}
+): [T | null, Error | null, Status] {
+  const cb = typeof optsOrCallback === "function" ? optsOrCallback : undefined;
+  const {
     reconnect = false,
     reconnectDelay = 1_000,
     parse = JSON.parse,
-  }: UseEventSourceOpts<T> = {}
-): [T | null, Error | null, Status] {
+  } = typeof optsOrCallback === "object" ? optsOrCallback : {};
   const [data, setData]     = useState<T | null>(null);
   const [error, setError]   = useState<Error | null>(null);
   const [status, setStatus] = useState<Status>("connecting");
@@ -56,7 +58,9 @@ export function useEventSource<T = unknown>(
       es.onmessage = (ev) => {
         try {
           // @ts-ignore – user might override parse to return void
-          setData(parse(ev.data));
+          const parsed = parse(ev.data);
+          setData(parsed);
+          cb?.(parsed);
         } catch (e) {
           setError(e as Error);
         }

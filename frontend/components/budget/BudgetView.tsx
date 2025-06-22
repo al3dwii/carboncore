@@ -13,11 +13,14 @@ export default function BudgetView({
   orgId: string;
 }) {
   const [data, setData] = useState(initial);
-
-  useEventSource<BudgetLine>(
+  const [evt] = useEventSource<BudgetLine>(
     `/api/proxy/org/${orgId}/budget/stream`,
-    (e) => setData(e)
+    { reconnect: true }
   );
+
+  useEffect(() => {
+    if (evt) setData(evt);
+  }, [evt]);
 
   return (
     <div className="space-y-6">

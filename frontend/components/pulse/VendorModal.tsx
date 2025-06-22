@@ -7,7 +7,7 @@ import { toastSuccess, toastError } from "@/lib/toast";
 
 export function VendorModal({ v, onClose }: { v: Vendor; onClose: () => void }) {
   async function handleEmail() {
-    const r = await fetch(`/api/vendors/${v.id}/email`, { method: "POST" });
+    const r = await fetch(`/api/proxy/vendors/${v.id}/email`, { method: "POST" });
     r.ok ? toastSuccess("Remediation email sent") : toastError("Failed");
   }
 

@@ -2,15 +2,17 @@
 import SchedulerCalendar from "./Calendar";
 import { Job } from "@/types/job";
 import { useEventSource } from "@/lib/useEventSource";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function SchedulerView({ initial, orgId }: { initial: Job[]; orgId: string }) {
-  const [jobs, setJobs] = useState(initial);
+  const [jobs, setJobs] = useState<Job[]>(initial ?? []);
+  const [evt] = useEventSource<Job>(`/api/proxy/org/${orgId}/jobs/stream`, {
+    reconnect: true,
+  });
 
-  useEventSource<Job>(
-    `/api/proxy/org/${orgId}/jobs/stream`,
-    (j) => setJobs((prev) => [j, ...prev])
-  );
+  useEffect(() => {
+    if (evt) setJobs((prev) => [evt, ...prev]);
+  }, [evt]);
 
   return <SchedulerCalendar jobs={jobs} />;
 }

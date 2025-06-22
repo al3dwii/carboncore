@@ -8,9 +8,10 @@ import { patchJob } from "@/lib/jobs-api";
 import { toastSuccess, toastError } from "@/lib/toast";
 import { JobTooltip } from "./JobTooltip";
 
-export default function SchedulerCalendar({ jobs }: { jobs: Job[] }) {
+export default function SchedulerCalendar({ jobs }: { jobs?: Job[] }) {
+  const safe = Array.isArray(jobs) ? jobs : [];
   const [events, setEvents] = useState(() =>
-    jobs.map((j) => ({
+    safe.map((j) => ({
       id: j.id,
       title: j.project,
       start: j.start,
