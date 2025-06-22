@@ -4,7 +4,13 @@ import { sdk } from '@carbon/sdk';
 import PageWrapper from '@/components/PageWrapper';
 
 export default function Advisor() {
-  const { data } = useQuery({ queryKey:['diffs'], queryFn: () => sdk.advisor__recent() });
+  const { data } = useQuery({
+    queryKey: ['diffs'],
+    queryFn: () =>
+      sdk.advisor__recent(undefined, {
+        headers: { 'x-project-token': process.env.NEXT_PUBLIC_PROJECT_TOKEN! },
+      }),
+  });
   return (
     <PageWrapper>
       <h1 className="text-lg font-medium mb-4">IaC Advisor results</h1>
