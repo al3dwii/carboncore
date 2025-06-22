@@ -1,0 +1,42 @@
+name: IaC Advisor
+
+on:
+  pull_request: { types: [opened, synchronize, reopened] }
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: hashicorp/setup-terraform@v2
+        with: { terraform_wrapper: false }
+
+      - name: gen plan
+        run: |
+          terraform init -input=false
+          terraform plan -out=plan.tfplan || true
+          terraform show -json plan.tfplan > plan.json || echo '{}' > plan.json
+
+      - name: call advisor
+        env:
+          URL: ${{ secrets.CARBONCORE_API_URL }}
+          TOK: ${{ secrets.CARBONCORE_API_TOKEN }}
+        run: |
+          curl -s -X POST "$URL/iac-advisor/analyze" \
+               -H"x-project-token:$TOK" \
+               -H"Content-Type: application/json" \
+               --data-binary @plan.json > out.json
+
+      - name: comment
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const fs=require('fs')
+            const body=JSON.parse(fs.readFileSync('out.json','utf8'))
+            if(!body.suggestions||!body.suggestions.length) return
+            let md="### IaC Advisor Suggestions\n"
+            for(const s of body.suggestions){
+              md+=`* **${s.resource}**: \`${s.current}\` → \`${s.suggestion}\`  (saves ~${s.co2_saved_kg_per_day} kg CO₂ / $${s.cost_saved_usd_per_day}/day)\n`
+            }
+            github.rest.issues.createComment({ ...context.repo, issue_number:context.issue.number, body:md })

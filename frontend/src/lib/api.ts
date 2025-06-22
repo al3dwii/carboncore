@@ -30,3 +30,16 @@ export async function request<T>(
   if (res.status === 204) return {} as T;
   return res.json() as Promise<T>;
 }
+import type { SavingEvent } from './types';
+
+const CC_BASE = process.env.CARBONCORE_URL ?? '';
+function req<T>(path: string) {
+  return fetch(`${CC_BASE}${path}`, {
+    headers: { 'x-project-token': process.env.NEXT_PUBLIC_PROJECT_TOKEN ?? '' },
+    cache: 'no-store',
+  }).then(r => r.json() as Promise<T>);
+}
+
+export const api = {
+  recentAdvisor: (n = 20) => req<SavingEvent[]>(`/iac-advisor/recent?limit=${n}`),
+};

@@ -6,7 +6,8 @@ export const NAV_BY_ROLE: Record<string, NavItem[]> = {
     { href: "/router", label: "Router", icon: "🗺", flag: "router" },
     { href: "/pulse", label: "Pulse", icon: "💓", flag: "pulse" },
     { href: "/ledger", label: "Ledger", icon: "📜" },
-    { href: "/scheduler", label: "Scheduler", icon: "⏱", flag: "scheduler" }
+    { href: "/scheduler", label: "Scheduler", icon: "⏱", flag: "scheduler" },
+    { href: "/iac-advisor", label: "IaC Advisor", icon: "🛠", flag: "iac-advisor" }
   ],
   finops: [
     { href: "/dashboard", label: "Dashboard", icon: "📊" },

@@ -28,6 +28,12 @@ const withProxyRewrites = {
       },
     ];
   },
+
+  async redirects() {
+    return [
+      { source: '/iac-advisor', destination: '/org/default/iac-advisor', permanent: false },
+    ];
+  },
 };
 
 module.exports = withProxyRewrites;
