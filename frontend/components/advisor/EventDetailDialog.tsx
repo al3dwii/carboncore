@@ -1,5 +1,5 @@
 "use client";
-import { Dialog, DialogPanel } from "@headlessui/react";
+import { Dialog } from "@headlessui/react";
 import { useEffect, useState } from "react";
 import { AdvisorEvent, api } from "@/lib/api";
 
@@ -16,7 +16,7 @@ export function EventDetailDialog({ id, onClose }: { id: string; onClose(): void
 
   return (
     <Dialog open onClose={onClose} className="fixed inset-0 grid place-items-center bg-black/40">
-      <DialogPanel className="w-[34rem] rounded-md bg-white p-6 shadow-xl">
+      <Dialog.Panel className="w-[34rem] rounded-md bg-white p-6 shadow-xl">
         {state === "loading" && <p>Loading…</p>}
         {state === "error"   && <p className="text-red-600">Couldn’t load event.</p>}
         {state === "ready" && evt && (
@@ -32,7 +32,7 @@ export function EventDetailDialog({ id, onClose }: { id: string; onClose(): void
             </table>
           </>
         )}
-      </DialogPanel>
+      </Dialog.Panel>
     </Dialog>
   );
 }
