@@ -48,7 +48,7 @@ export default function EventsClient() {
           items={items}
           rowRenderer={(ev: any) => (
             <div
-              className="grid grid-cols-[160px_100px_120px_1fr] gap-2 text-sm hover:bg-muted/40 cursor-pointer"
+              className="hover:bg-muted/40 grid cursor-pointer grid-cols-[160px_100px_120px_1fr] gap-2 text-sm"
               onClick={() => router.push(`/events/${ev.id}`)}
             >
               <span>{new Date(ev.ts).toLocaleString()}</span>
@@ -59,7 +59,7 @@ export default function EventsClient() {
           )}
           rowClassName={i => (i % 2 ? 'bg-muted/20' : '')}
         />
-        {isFetchingNextPage && <Loader2 className="animate-spin mx-auto my-4" />}
+        {isFetchingNextPage && <Loader2 className="mx-auto my-4 animate-spin" />}
         <button
           hidden
           ref={el => {

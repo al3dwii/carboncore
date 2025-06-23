@@ -19,5 +19,9 @@ export async function pollStatus(jobId: string, onProgress: (pct: number) => voi
         reject(new Error("Report error"));
       }
     };
+    es.onerror = () => {
+      es.close();
+      reject(new Error("Report error"));
+    };
   });
 }

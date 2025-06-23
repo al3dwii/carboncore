@@ -32,14 +32,14 @@ export function WebhookTable({ initial }: { initial?: Webhook[] }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex gap-2 max-w-md">
+      <div className="flex max-w-md gap-2">
         <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://example.com/hook" />
         <Button onClick={add}>Add</Button>
       </div>
       <ul className="space-y-2">
         {hooks.map((h) => (
-          <li key={h.id} className="flex justify-between bg-white/5 px-3 py-1 rounded">
-            <span className="truncate mr-2">{h.url}</span>
+          <li key={h.id} className="flex justify-between rounded bg-white/5 px-3 py-1">
+            <span className="mr-2 truncate">{h.url}</span>
             <Button variant="ghost" size="sm" onClick={() => remove(h.id)} {...({} as any)}>
               Remove
             </Button>

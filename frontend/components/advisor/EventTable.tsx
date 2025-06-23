@@ -1,9 +1,9 @@
 'use client';
 import type { SavingEvent } from '@/lib/types';
 
-export function EventTable({ rows }: { rows: SavingEvent[] }) {
+export function EventTable({ rows, onRowClick }: { rows: SavingEvent[]; onRowClick?: (id: string) => void }) {
   return (
-    <table className="w-full text-sm border-collapse">
+    <table className="w-full border-collapse text-sm">
       <thead>
         <tr className="text-left text-white/60">
           <th className="py-2">Project</th>
@@ -15,7 +15,11 @@ export function EventTable({ rows }: { rows: SavingEvent[] }) {
       </thead>
       <tbody>
         {rows.map(r => (
-          <tr key={r.id} className="border-t border-white/10">
+          <tr
+            key={r.id}
+            className="cursor-pointer border-t border-white/10 hover:bg-white/5"
+            onClick={() => onRowClick?.(r.id)}
+          >
             <td className="py-2">{r.project_id}</td>
             <td>{r.feature}</td>
             <td>{r.co2}</td>

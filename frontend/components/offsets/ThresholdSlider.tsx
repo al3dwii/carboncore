@@ -32,7 +32,7 @@ export function ThresholdSlider({ orgId }: { orgId: string }) {
         step={100}
         value={q.data}
         onChange={m.mutate}
-        className="w-full h-2 bg-gray-200 rounded"
+        className="h-2 w-full rounded bg-gray-200"
       />
     </div>
   );

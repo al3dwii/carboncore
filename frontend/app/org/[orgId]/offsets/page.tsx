@@ -19,9 +19,9 @@ async function Content({ orgId }: { orgId: string }) {
   const initial = await api.currentResidual(orgId);
   return (
     <>
-      <h1 className="text-2xl font-bold mb-6">Offsets & Net Zero</h1>
+      <h1 className="mb-6 text-2xl font-bold">Offsets & Net Zero</h1>
 
-      <div className="grid md:grid-cols-2 gap-6 mb-8">
+      <div className="mb-8 grid gap-6 md:grid-cols-2">
         <NetZeroGauge initial={initial.residual} />
         <ThresholdSlider orgId={orgId} />
       </div>

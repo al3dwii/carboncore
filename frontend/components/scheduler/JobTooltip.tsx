@@ -11,7 +11,7 @@ export function JobTooltip({ eventArg }: { eventArg: any }) {
         <div>{eventArg.timeText} • {eventArg.event.title}</div>
       </TooltipTrigger>
       {pct !== 0 && (
-        <TooltipContent className="bg-cc-base p-3 rounded text-sm">
+        <TooltipContent className="bg-cc-base rounded p-3 text-sm">
           {pct < 0 ? "Move here to cut " : "Moving adds "}
           {Math.abs(pct)} % CO₂
           {j.suggestedStart && (

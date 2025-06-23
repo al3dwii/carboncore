@@ -19,7 +19,7 @@ export function GaugeCanvas({ value, dangerThreshold, unit }: { value: number; d
   return (
     <div className="w-24 text-center">
       <canvas ref={ref} width={100} height={60} />
-      <p className="text-xs mt-1">
+      <p className="mt-1 text-xs">
         {value.toFixed(1)} {unit}
       </p>
     </div>

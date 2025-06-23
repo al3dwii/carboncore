@@ -31,6 +31,15 @@ export async function request<T>(
   return res.json() as Promise<T>;
 }
 import type { SavingEvent } from './types';
+export interface AdvisorEvent {
+  id: string;
+  project: string;
+  feature: string;
+  kg_co2: number;
+  usd: number;
+  commit: string;
+  date: string;
+}
 
 const CC_BASE = process.env.CARBONCORE_URL ?? '';
 function req<T>(path: string) {
@@ -42,5 +51,15 @@ function req<T>(path: string) {
 
 export const api = {
   recentAdvisor: (n = 20) => req<SavingEvent[]>(`/iac-advisor/recent?limit=${n}`),
+  getAdvisorEvent: (id: string) => req<AdvisorEvent>(`/iac-advisor/event/${id}`),
+  patchBudget: (body: { budget: number }) => request(`/api/budget`, {
+    method: 'PATCH',
+    body: JSON.stringify(body)
+  }),
+  patchVendorThreshold: (value: number) => request(`/api/vendor-threshold`, {
+    method: 'PATCH',
+    body: JSON.stringify({ threshold: value })
+  }),
+  getEcoLabelStats: (orgId: string) => req<{ route: string; avg: number; views: number }[]>(`/org/${orgId}/ecolabel`),
   currentResidual: (orgId: string) => req<{ residual: number }>(`/org/${orgId}/offsets/residual`),
 };

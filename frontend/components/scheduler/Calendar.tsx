@@ -2,11 +2,13 @@
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import { CalendarApi } from "@fullcalendar/core";
 import { Job } from "@/types/job";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { patchJob } from "@/lib/jobs-api";
 import { toastSuccess, toastError } from "@/lib/toast";
 import { JobTooltip } from "./JobTooltip";
+import { useGridOverlay } from "./GridIntensityOverlay";
 
 export default function SchedulerCalendar({ jobs }: { jobs?: Job[] }) {
   const safe = Array.isArray(jobs) ? jobs : [];
@@ -19,10 +21,14 @@ export default function SchedulerCalendar({ jobs }: { jobs?: Job[] }) {
       extendedProps: j
     }))
   );
+  const calRef = useRef<FullCalendar | null>(null);
+  useGridOverlay(calRef.current ? (calRef.current as any).getApi() as CalendarApi : null);
 
   async function handleDrop(info: any) {
     const { id } = info.event;
     const newStart = info.event.start;
+    const ok = confirm(`Reschedule job to ${newStart.toLocaleString()}?`);
+    if (!ok) return info.revert();
     try {
       await patchJob(id, { start: newStart.toISOString() });
       toastSuccess("Job rescheduled to greener slot 👍");
@@ -34,6 +40,7 @@ export default function SchedulerCalendar({ jobs }: { jobs?: Job[] }) {
 
   return (
     <FullCalendar
+      ref={calRef}
       plugins={[timeGridPlugin, interactionPlugin]}
       initialView="timeGridWeek"
       allDaySlot={false}

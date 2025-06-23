@@ -9,7 +9,7 @@ export function RemainingBudgetTile({ initial }: { initial: number }) {
   return (
     <div className={`rounded p-4 ${danger ? "bg-cc-red animate-pulse" : "bg-white/5"}`}>
       <p className="text-sm">Remaining budget</p>
-      <p className="text-2xl font-mono">{value.toFixed(0)} €</p>
+      <p className="font-mono text-2xl">{value.toFixed(0)} €</p>
     </div>
   );
 }

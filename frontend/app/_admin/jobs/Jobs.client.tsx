@@ -14,7 +14,7 @@ export default function JobsClient() {
   return (
     <div className="space-y-6">
       <header className="flex items-center justify-between">
-        <h1 className="font-bold text-lg">Jobs</h1>
+        <h1 className="text-lg font-bold">Jobs</h1>
         <Button size="sm" variant="outline" onClick={() => setRefresh((x) => !x)}>
           {refresh ? 'Stop auto refresh' : 'Refresh every 10s'}
         </Button>
@@ -35,7 +35,7 @@ function JobSection({ state }: { state: string }) {
 
   return (
     <div>
-      <h2 className="font-medium capitalize mb-2">{state}</h2>
+      <h2 className="mb-2 font-medium capitalize">{state}</h2>
       <table className="w-full text-sm">
         <tbody>
           {data.items.map((j) => (

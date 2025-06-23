@@ -39,17 +39,17 @@ export function OrgSwitcher({ currentId }: { currentId: string }) {
 
   return (
     <Menu as="div" className="relative">
-      <Menu.Button className="px-3 py-1 rounded bg-white/10">
+      <Menu.Button className="rounded bg-white/10 px-3 py-1">
         {currentOrg}
       </Menu.Button>
 
-      <Menu.Items className="absolute right-0 mt-2 bg-cc-base
-                              border border-white/10 rounded max-h-60 overflow-y-auto">
+      <Menu.Items className="bg-cc-base absolute right-0 mt-2
+                              max-h-60 overflow-y-auto rounded border border-white/10">
         {orgs.map(o => (
           <Menu.Item key={o.id}>
             {({ active }) => (
               <button
-                className={`block w-full text-left px-4 py-2
+                className={`block w-full px-4 py-2 text-left
                             ${active ? "bg-white/10" : ""}`}
                 onClick={() => router.replace(newOrgPath(o.id))}
               >

@@ -95,7 +95,7 @@ export async function request<
       return FIXTURES[key] as R;
     }
     // no fixture yet → avoid crashes
-    /* eslint-disable-next-line no-console */
+     
     console.warn("[API] missing fixture for", key);
     return {} as R;
   }

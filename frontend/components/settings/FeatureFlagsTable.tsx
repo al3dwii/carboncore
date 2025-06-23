@@ -26,7 +26,7 @@ export function FeatureFlagsTable() {
   }
 
   return (
-    <table className="text-sm w-full">
+    <table className="w-full text-sm">
       <thead>
         <tr className="text-left text-white/60">
           <th className="py-2">Feature</th>

@@ -1,5 +1,5 @@
 "use client";
-import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ReferenceLine } from "recharts";
+import { LineChart, Line, CartesianGrid, XAxis, YAxis, Tooltip, ReferenceLine, Legend } from "recharts";
 import { BudgetLine } from "@/types/budget";
 import { useEventSource } from "@/lib/useEventSource";
 import { useEffect, useState } from "react";
@@ -28,6 +28,7 @@ export function BudgetChart({ initial }: { initial: BudgetLine }) {
       <XAxis dataKey="date" tick={{ fontSize: 12 }} />
       <YAxis tick={{ fontSize: 12 }} />
       <Tooltip />
+      <Legend />
       <Line type="monotone" dataKey="eur" stroke="#34d399" dot={false} name="Actual" />
       <Line
         type="monotone"

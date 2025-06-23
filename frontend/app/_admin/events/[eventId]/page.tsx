@@ -21,21 +21,21 @@ export default async function EventDetail({ params: { eventId } }: { params: { e
   return (
     <div className="space-y-6">
       <header className="flex items-center justify-between">
-        <h1 className="font-bold text-lg">Event {eventId}</h1>
+        <h1 className="text-lg font-bold">Event {eventId}</h1>
         <Button formAction={replay}>Replay</Button>
       </header>
 
       <div className="tabs">
-        <input type="radio" id="raw" name="tab" defaultChecked className="hidden peer" />
+        <input type="radio" id="raw" name="tab" defaultChecked className="peer hidden" />
         <label htmlFor="raw" className="tab">Raw</label>
-        <input type="radio" id="diff" name="tab" className="hidden peer" />
+        <input type="radio" id="diff" name="tab" className="peer hidden" />
         <label htmlFor="diff" className="tab">Diff</label>
 
         <div className="pt-4">
-          <div className="peer-checked:block hidden" id="rawPane">
+          <div className="hidden peer-checked:block" id="rawPane">
             <JsonViewer src={(ev as any).payload} theme="monokai" enableClipboard={false} />
           </div>
-          <div className="peer-checked:block hidden" id="diffPane">
+          <div className="hidden peer-checked:block" id="diffPane">
             {prev ? <DiffViewer oldData={(prev as any).payload} newData={(ev as any).payload} /> : 'No previous event'}
           </div>
         </div>

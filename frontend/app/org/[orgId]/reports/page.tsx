@@ -7,7 +7,7 @@ export default function ReportsPage() {
   return (
     <Suspense fallback={<Loading />}>
       <section>
-        <h1 className="text-2xl font-bold mb-6">CarbonComply Report Wizard</h1>
+        <h1 className="mb-6 text-2xl font-bold">CarbonComply Report Wizard</h1>
         <ReportWizard />
       </section>
     </Suspense>
