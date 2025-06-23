@@ -13,12 +13,14 @@ export const NAV_BY_ROLE: Record<string, NavItem[]> = {
   finops: [
     { href: "/dashboard", label: "Dashboard", icon: "📊" },
     { href: "/ledger", label: "Ledger", icon: "📜" },
-    { href: "/budget", label: "Budget", icon: "💶", flag: "budget" }
+    { href: "/budget", label: "Budget", icon: "💶", flag: "budget" },
+    { href: "/offsets", label: "Offsets", icon: "🌿" }
   ],
   sustainability: [
     { href: "/dashboard", label: "Dashboard", icon: "📊" },
     { href: "/ledger", label: "Ledger", icon: "📜" },
     { href: "/reports", label: "Reports", icon: "📄" },
+    { href: "/ecolabel", label: "EcoLabel", icon: "🏷" },
     { href: "/offsets", label: "Offsets", icon: "🌳" }
   ],
   admin: [{ href: "/settings", label: "Settings", icon: "⚙️" }]

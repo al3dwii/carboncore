@@ -11,13 +11,13 @@ export const Slider = forwardRef<
   return (
     <RadixSlider.Root
       ref={ref}
-      className="relative flex items-center select-none touch-none w-full h-5"
+      className="relative flex h-5 w-full touch-none select-none items-center"
       {...props}
     >
-      <RadixSlider.Track className="bg-white/20 relative grow rounded-full h-[3px]">
-        <RadixSlider.Range className="absolute bg-green-500 rounded-full h-full" />
+      <RadixSlider.Track className="relative h-[3px] grow rounded-full bg-white/20">
+        <RadixSlider.Range className="absolute h-full rounded-full bg-green-500" />
       </RadixSlider.Track>
-      <RadixSlider.Thumb className="block w-4 h-4 bg-green-500 rounded-full" />
+      <RadixSlider.Thumb className="block size-4 rounded-full bg-green-500" />
     </RadixSlider.Root>
   );
 });

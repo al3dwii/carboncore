@@ -21,7 +21,7 @@ export default function OffsetLedger({
   }, [evt]);
 
   return (
-    <table className="w-full text-sm border-collapse">
+    <table className="w-full border-collapse text-sm">
       <thead>
         <tr className="text-left text-white/60">
           <th className="py-2">Date</th>

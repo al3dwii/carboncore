@@ -1,25 +1,22 @@
-import { api } from "@/lib/api";
-import { EventTable } from "@/components/EventTable";
-import { Suspense } from "react";
-import { Loading } from "@/components/Loading";
-
-
-export const revalidate = 60;
+"use client";
+import EventTable from "@/components/advisor/EventTable";
+import { EventDetailDialog } from "@/components/advisor/EventDetailDialog";
+import { useState } from "react";
+import { AsyncStates } from "@/components/ui/AsyncStates";
+import { useAdvisorEvents } from "@/lib/useAdvisorEvents";
 
 export default function Page() {
-  return (
-    <Suspense fallback={<Loading />}>
-      <Content />
-    </Suspense>
-  );
-}
+  const { data, error, isLoading } = useAdvisorEvents();
+  const [selected, setSelected] = useState<string | null>(null);
 
-async function Content() {
-  const rows = await api.recentAdvisor();
+  if (isLoading) return <AsyncStates state="loading" />;
+  if (error) return <AsyncStates state="error" error="Failed to load events." />;
+  if (!data?.length) return <AsyncStates state="empty" message="No advisor events yet." />;
+
   return (
     <>
-      <h1 className="text-xl font-bold mb-4">IaC Advisor</h1>
-      <EventTable rows={rows} />
+      <EventTable rows={data} onRowClick={(id)=>setSelected(id)} />
+      {selected && <EventDetailDialog id={selected} onClose={()=>setSelected(null)} />}
     </>
   );
 }

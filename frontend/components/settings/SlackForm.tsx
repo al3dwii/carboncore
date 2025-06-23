@@ -19,7 +19,7 @@ export function SlackForm({ initial }: { initial?: string }) {
   }
 
   return (
-    <div className="space-y-3 max-w-md">
+    <div className="max-w-md space-y-3">
       <Input value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://hooks.slack.com/…" />
       <Button onClick={handleSave}>Save & Test</Button>
     </div>

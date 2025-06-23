@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children:React.ReactNode }){
   return (
     <ClerkProvider>
       <html lang="en" className={inter.variable}>
-        <body className="antialiased bg-gray-50 text-gray-800">
+        <body className="bg-gray-50 text-gray-800 antialiased">
           <Providers>
             <Shell>{children}</Shell>
           </Providers>

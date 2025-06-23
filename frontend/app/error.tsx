@@ -1,9 +1,11 @@
 "use client";
-export default function Error({ error }: { error: Error }) {
+export default function GlobalError({ error }: { error: Error }) {
   return (
-    <div className="p-10 text-center">
-      <h1 className="text-red-600 text-xl font-bold mb-4">Something went wrong</h1>
-      <pre className="text-sm text-gray-500">{error.message}</pre>
-    </div>
+    <html>
+      <body className="p-6 text-red-700">
+        <h1 className="text-lg font-bold">Something went wrong 💥</h1>
+        <pre className="whitespace-pre-wrap">{error.message}</pre>
+      </body>
+    </html>
   );
 }

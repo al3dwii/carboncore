@@ -1,5 +1,5 @@
 // __tests__/EventTable.test.tsx
-import { EventTable } from "@/components/EventTable";
+import { EventTable } from "@/components/advisor/EventTable";
 import { describe, expect, it } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 

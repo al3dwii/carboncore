@@ -20,10 +20,10 @@ async function Content({ orgId }: { orgId: string }) {
   const kpis = await fetchKpis(id);
   return (
     <div className="space-y-6">
-      <h1 className="font-bold text-lg">Dashboard</h1>
+      <h1 className="text-lg font-bold">Dashboard</h1>
       <ul className="grid grid-cols-2 gap-4">
         {kpis.items.map((k: any) => (
-          <li key={k.name} className="border rounded p-4">
+          <li key={k.name} className="rounded border p-4">
             <p className="text-muted-foreground text-sm">{k.name}</p>
             <p className="text-2xl font-bold">{k.value}</p>
           </li>

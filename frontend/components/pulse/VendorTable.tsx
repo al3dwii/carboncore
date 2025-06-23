@@ -39,13 +39,13 @@ export default function VendorTable({
           {vendors.map((v) => (
             <tr
               key={v.id}
-              className="border-t border-white/10 hover:bg-white/5 cursor-pointer"
+              className="cursor-pointer border-t border-white/10 hover:bg-white/5"
               onClick={() => setModal(v)}
             >
-              <td className="py-2 flex items-center gap-2">
+              <td className="flex items-center gap-2 py-2">
                 {v.name}
                 {isBreach(v) && (
-                  <span className="px-2 rounded bg-cc-red text-xs">⚠ breach</span>
+                  <span className="bg-cc-red rounded px-2 text-xs">⚠ breach</span>
                 )}
               </td>
               <td>{new URL(v.endpoint).host}</td>

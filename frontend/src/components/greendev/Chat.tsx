@@ -18,7 +18,7 @@ export function Chat({ orgId }: { orgId: string }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex-1 overflow-y-auto rounded border p-4 h-[50vh]">
+      <div className="h-[50vh] flex-1 overflow-y-auto rounded border p-4">
         {history.map((m) => (
           <p key={m.id} className={m.role === 'bot' ? 'text-green-700' : ''}>
             <strong>{m.role === 'bot' ? 'Bot:' : 'You:'}</strong> {m.content}
@@ -35,7 +35,7 @@ export function Chat({ orgId }: { orgId: string }) {
           className="flex-1 rounded border px-3 py-2"
         />
         <button className="rounded bg-emerald-600 px-4 py-2 text-white">
-          <PaperAirplaneIcon className="h-5 w-5 -rotate-45" />
+          <PaperAirplaneIcon className="size-5 -rotate-45" />
         </button>
       </form>
     </div>
