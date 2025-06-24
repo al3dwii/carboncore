@@ -1,32 +1,12 @@
-import OffsetLedger from "@/components/offsets/OffsetLedger";
-import { NetZeroGauge } from "@/components/offsets/NetZeroGauge";
-import { ThresholdSlider } from "@/components/offsets/ThresholdSlider";
-import { api } from "@/lib/api";
-import { Suspense } from 'react';
-import { Loading } from '@/components/Loading';
-
-export const revalidate = 60;
-
-export default function Page({ params: { orgId } }: { params: { orgId: string } }) {
+export default function OffsetsPage() {
   return (
-    <Suspense fallback={<Loading />}>
-      <Content orgId={orgId} />
-    </Suspense>
-  );
-}
-
-async function Content({ orgId }: { orgId: string }) {
-  const initial = await api.currentResidual(orgId);
-  return (
-    <>
-      <h1 className="mb-6 text-2xl font-bold">Offsets & Net Zero</h1>
-
-      <div className="mb-8 grid gap-6 md:grid-cols-2">
-        <NetZeroGauge initial={initial.residual} />
-        <ThresholdSlider orgId={orgId} />
+    <section className="space-y-6">
+      <h1 className="text-2xl font-semibold">Offsets</h1>
+      <div className="rounded-lg bg-white p-6 shadow dark:bg-zinc-900">
+        <p className="text-gray-500 dark:text-gray-400">
+          Offsets functionality coming soon.
+        </p>
       </div>
-
-      <OffsetLedger orgId={orgId} />
-    </>
+    </section>
   );
 }
