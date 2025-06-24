@@ -1,5 +1,6 @@
-import { request } from './request';
+import { request } from "@/src/lib/request";
+import type { Kpi } from "@/src/types/kpi";
 
-export function fetchKpis(orgId: string) {
-  return request<{ items: { name: string; value: number }[] }>(`/api/org/${orgId}/kpi`);
+export async function fetchKpis(orgId: string): Promise<{ items: Kpi[] }> {
+  return request(`/api/org/${orgId}/kpi`);
 }

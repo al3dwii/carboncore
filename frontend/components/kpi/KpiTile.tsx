@@ -1,9 +1,21 @@
 "use client";
-export function KpiTile({ label, value }: { label: string; value: string | number }) {
+
+export function KpiTile({
+  label,
+  value,
+  unit,
+}: {
+  label: string;
+  value: number | string;
+  unit?: string;
+}) {
   return (
-    <div className="rounded-lg bg-white p-4 shadow">
-      <div className="text-sm text-gray-500">{label}</div>
-      <div className="text-2xl font-bold">{value}</div>
+    <div className="rounded bg-white p-4 shadow-sm">
+      <p className="text-xs text-neutral-500">{label}</p>
+      <p className="mt-1 text-2xl font-semibold">
+        {value}
+        {unit && <span className="ml-1 text-sm">{unit}</span>}
+      </p>
     </div>
   );
 }

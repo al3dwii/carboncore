@@ -45,7 +45,7 @@ export default defineConfig({
     exclude: ['node_modules', '.next', 'dist', 'out'],
 
     // runs once before all suites
-    setupFiles: ['./vitest.setup.ts'],
+    setupFiles: ['./tests/setup.ts'],
 
     // inline the common Testing-Library deps
     server: {

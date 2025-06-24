@@ -1,7 +1,16 @@
-import { request } from "@/lib/client";
-import { LedgerEvent, LedgerEvent as T } from "@/types/ledger";
+import { request } from "@/src/lib/request";
+export interface LedgerRow {
+  id: string;
+  ts: string;
+  project: string;
+  sku: string;
+  kwh: number;
+  kg: number;
+}
 
-export async function fetchLedger(limit = 50): Promise<T[]> {
-  const data = (await request("/ledger", "get", { limit } as any)) as T[];
-  return LedgerEvent.array().parse(data);
+export async function fetchLedger(
+  orgId: string,
+  limit = 50,
+): Promise<LedgerRow[]> {
+  return request(`/api/org/${orgId}/ledger?limit=${limit}`);
 }
