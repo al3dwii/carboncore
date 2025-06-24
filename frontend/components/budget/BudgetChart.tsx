@@ -6,9 +6,7 @@ import { useEffect, useState } from "react";
 
 export function BudgetChart({ initial }: { initial: BudgetLine }) {
   const [data, setData] = useState(initial);
-  const [evt] = useEventSource<BudgetLine>("/api/proxy/budget/stream", {
-    reconnect: true,
-  });
+  const [evt] = useEventSource<BudgetLine>("/api/proxy/budget/stream");
 
   useEffect(() => {
     if (evt) setData(evt);

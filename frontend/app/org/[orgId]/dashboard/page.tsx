@@ -1,5 +1,4 @@
 import { fetchKpis } from '@/lib/kpi-api';
-import { getActiveOrgId } from '@/lib/org';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { Loading } from '@/components/Loading';
@@ -15,9 +14,8 @@ export default function DashboardPage({ params }: { params: { orgId: string } })
 }
 
 async function Content({ orgId }: { orgId: string }) {
-  const id = getActiveOrgId(orgId);
-  if (!id) notFound();
-  const kpis = await fetchKpis(id);
+  if (!orgId) notFound();
+  const kpis = await fetchKpis(orgId);
   return (
     <div className="space-y-6">
       <h1 className="text-lg font-bold">Dashboard</h1>

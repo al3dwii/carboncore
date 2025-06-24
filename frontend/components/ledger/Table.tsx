@@ -19,8 +19,7 @@ export default function LedgerTable({
 
   /* 2 ─ use the current hook signature: [data, err, status] */
   const [event] = useEventSource<LedgerEvent>(
-    `/api/proxy/org/${orgId}/ledger/stream`,
-    { reconnect: true }               // any opts you like
+    `/api/proxy/org/${orgId}/ledger/stream`
   );
 
   /* 3 ─ apply side-effects only when a new event arrives */

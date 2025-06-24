@@ -12,8 +12,7 @@ export default function OffsetLedger({
 }) {
   const [rows, setRows] = useState<OffsetPurchase[]>(initial);
   const [evt] = useEventSource<OffsetPurchase>(
-    `/api/proxy/org/${orgId}/offsets/stream`,
-    { reconnect: true }
+    `/api/proxy/org/${orgId}/offsets/stream`
   );
 
   useEffect(() => {

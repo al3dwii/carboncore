@@ -10,8 +10,7 @@ interface AlertEvent {
 
 export function BudgetAlertToasts() {
   const [evt] = useEventSource<AlertEvent>(
-    "/api/proxy/budget/stream",
-    { reconnect: true }
+    "/api/proxy/budget/stream"
   );
 
   useEffect(() => {
