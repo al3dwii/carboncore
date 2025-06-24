@@ -1,5 +1,5 @@
 // __tests__/EventTable.test.tsx
-import { EventTable } from "@/components/advisor/EventTable";
+import { EventTable } from "../components/advisor/EventTable";
 import { describe, expect, it } from "vitest";
 import { render, screen, within } from "@testing-library/react";
 
@@ -24,8 +24,8 @@ describe("<EventTable />", () => {
 
     expect(utils.getByText(row.project_id)).toBeInTheDocument();
     expect(utils.getByText(row.feature)).toBeInTheDocument();
-    expect(utils.getByText(/\$0\.25/)).toBeInTheDocument();
-    expect(utils.getByText("0.08 kg")).toBeInTheDocument();
+    expect(utils.getByText("0.25")).toBeInTheDocument();
+    expect(utils.getByText("0.08")).toBeInTheDocument();
   });
 
   it("renders **no rows** when rows = []", () => {

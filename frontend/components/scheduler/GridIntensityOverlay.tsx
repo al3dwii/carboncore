@@ -1,11 +1,13 @@
 import { CalendarApi } from "@fullcalendar/core";
 import { useEffect } from "react";
-import { api } from "@/lib/api";
+import { getGridIntensity } from "@/lib/api/grid";
+import { getActiveOrgId } from "@/lib/org";
 
 export function useGridOverlay(cal: CalendarApi | null) {
   useEffect(() => {
     if (!cal) return;
-    api.getGridIntensity(cal.view.activeStart, cal.view.activeEnd)
+    const orgId = getActiveOrgId();
+    getGridIntensity(orgId, cal.view.activeStart, cal.view.activeEnd)
        .then(slots => {
          cal.getEvents().forEach(e => {
            const slot = slots.find(s => e.start! >= s.start && e.start! < s.end);
