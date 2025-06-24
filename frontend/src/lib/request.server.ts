@@ -8,7 +8,7 @@ type Verb = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export async function request<T = unknown>(
   input: string,
-  init: RequestInit = {},
+  init: RequestInit & { revalidate?: number } = {},
   fallback: Verb = 'GET',
 ): Promise<T> {
   const url =
@@ -27,6 +27,7 @@ export async function request<T = unknown>(
 
   const res = await fetch(url, {
     credentials: 'include',
+    next: { revalidate: init?.revalidate ?? 30 },
     ...init,
     headers: {
       Accept: 'application/json',
