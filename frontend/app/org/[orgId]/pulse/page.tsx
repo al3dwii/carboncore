@@ -1,5 +1,5 @@
 import PulseVendors from "@/components/pulse/VendorTable";
-import { request }  from "@/lib/client";
+import { fetchVendors } from "@/lib/vendor-api";
 import { Suspense } from 'react';
 import { Loading } from '@/components/Loading';
 
@@ -12,6 +12,6 @@ export default function Pulse({ params: { orgId } }: { params: { orgId: string }
 }
 
 async function Content({ orgId }: { orgId: string }) {
-  const vendors = await request("/org/{orgId}/vendors", "get", { orgId });
-  return <PulseVendors initial={vendors as any} orgId={orgId} />;
+  const vendors = await fetchVendors(orgId);
+  return <PulseVendors initial={vendors} orgId={orgId} />;
 }

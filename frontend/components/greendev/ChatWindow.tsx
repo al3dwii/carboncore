@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 export default function ChatWindow() {
-  const { messages, send } = useChat();
+  const { messages = [], send } = useChat();
   return (
     <div className="flex h-full flex-col">
       <div className="grow space-y-3 overflow-y-auto p-4">

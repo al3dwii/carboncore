@@ -1,5 +1,5 @@
 "use client";
-import EventTable from "@/components/advisor/EventTable";
+import { EventTable } from "@/components/advisor/EventTable";
 import { EventDetailDialog } from "@/components/advisor/EventDetailDialog";
 import { useState } from "react";
 import { AsyncStates } from "@/components/ui/AsyncStates";

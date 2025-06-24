@@ -36,7 +36,7 @@ export default function VendorTable({
           </tr>
         </thead>
         <tbody>
-          {vendors.map((v) => (
+          {Array.isArray(vendors) && vendors.map((v) => (
             <tr
               key={v.id}
               className="cursor-pointer border-t border-white/10 hover:bg-white/5"
