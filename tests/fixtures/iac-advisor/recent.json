@@ -1,0 +1,10 @@
+[
+  {
+    "id": "demo-1",
+    "project": "core",
+    "feature": "S3-to-IA",
+    "kg_co2": 0.8,
+    "usd": 3.22,
+    "date": "2025-06-24T14:00:00Z"
+  }
+]
