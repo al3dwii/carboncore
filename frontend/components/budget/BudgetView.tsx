@@ -17,8 +17,7 @@ export default function BudgetView({
   const [data, setData] = useState(initial);
   const [showModal, setShowModal] = useState(false);
   const [evt] = useEventSource<BudgetLine>(
-    `/api/proxy/org/${orgId}/budget/stream`,
-    { reconnect: true }
+    `/api/proxy/org/${orgId}/budget/stream`
   );
 
   useEffect(() => {

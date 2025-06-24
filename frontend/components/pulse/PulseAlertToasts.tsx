@@ -9,9 +9,7 @@ interface AlertEvent {
 }
 
 export function PulseAlertToasts() {
-  const [evt] = useEventSource<AlertEvent>("/api/proxy/vendors/stream", {
-    reconnect: true,
-  });
+  const [evt] = useEventSource<AlertEvent>("/api/proxy/vendors/stream");
 
   useEffect(() => {
     if (!evt) return;

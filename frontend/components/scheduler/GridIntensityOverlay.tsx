@@ -1,12 +1,12 @@
 import { CalendarApi } from "@fullcalendar/core";
 import { useEffect } from "react";
 import { getGridIntensity } from "@/lib/api/grid";
-import { getActiveOrgId } from "@/lib/org";
+import { useOrg } from "@/contexts/OrgContext";
 
 export function useGridOverlay(cal: CalendarApi | null) {
+  const { id: orgId } = useOrg();
   useEffect(() => {
     if (!cal) return;
-    const orgId = getActiveOrgId();
     getGridIntensity(orgId, cal.view.activeStart, cal.view.activeEnd)
        .then(slots => {
          cal.getEvents().forEach(e => {
@@ -15,5 +15,5 @@ export function useGridOverlay(cal: CalendarApi | null) {
            e.setProp("classNames", slot.clean ? ["!bg-green-100"] : ["!bg-red-50"]);
          });
        });
-  }, [cal, cal?.view.activeStart.valueOf()]);
+  }, [cal, cal?.view.activeStart.valueOf(), orgId]);
 }

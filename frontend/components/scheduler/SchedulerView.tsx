@@ -6,9 +6,7 @@ import { useState, useEffect } from "react";
 
 export default function SchedulerView({ initial, orgId }: { initial: Job[]; orgId: string }) {
   const [jobs, setJobs] = useState<Job[]>(initial ?? []);
-  const [evt] = useEventSource<Job>(`/api/proxy/org/${orgId}/jobs/stream`, {
-    reconnect: true,
-  });
+  const [evt] = useEventSource<Job>(`/api/proxy/org/${orgId}/jobs/stream`);
 
   useEffect(() => {
     if (evt) setJobs((prev) => [evt, ...prev]);

@@ -16,8 +16,7 @@ export default function VendorTable({
   const [modal, setModal] = useState<Vendor | null>(null);
 
   const [evt] = useEventSource<Vendor>(
-    `/api/proxy/org/${orgId}/vendors/stream`,
-    { reconnect: true }
+    `/api/proxy/org/${orgId}/vendors/stream`
   );
 
   useEffect(() => {
