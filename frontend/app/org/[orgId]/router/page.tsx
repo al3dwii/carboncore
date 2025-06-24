@@ -1,17 +1,12 @@
-import RouterView from "@/components/router/RouterView";
-import { request }  from "@/lib/client";
-import { Suspense } from 'react';
-import { Loading } from '@/components/Loading';
-
-export default function RouterPage({ params: { orgId } }: { params: { orgId: string } }) {
+export default function RouterPage() {
   return (
-    <Suspense fallback={<Loading />}>
-      <Content orgId={orgId} />
-    </Suspense>
+    <section className="space-y-6">
+      <h1 className="text-2xl font-semibold">Router</h1>
+      <div className="rounded-lg bg-white p-6 shadow dark:bg-zinc-900">
+        <p className="text-gray-500 dark:text-gray-400">
+          Router functionality coming soon.
+        </p>
+      </div>
+    </section>
   );
-}
-
-async function Content({ orgId }: { orgId: string }) {
-  const data = await request("/org/{orgId}/router", "get", { orgId });
-  return <RouterView initial={data} orgId={orgId} />;
 }

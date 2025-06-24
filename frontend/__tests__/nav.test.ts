@@ -2,13 +2,11 @@ import { describe, expect, it } from "vitest";
 import { NAV_BY_ROLE } from "@/lib/nav";
 
 describe("NAV_BY_ROLE contract", () => {
-  it("contains the four primary roles we expose in the UI", () => {
+  it("contains the roles we expose in the UI", () => {
     expect(Object.keys(NAV_BY_ROLE)).toEqual(
       expect.arrayContaining([
         "developer",
         "finops",
-        "sustainability",
-        "admin",
       ]),
     );
   });

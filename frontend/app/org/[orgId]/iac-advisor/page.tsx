@@ -1,22 +1,12 @@
-"use client";
-import { EventTable } from "@/components/advisor/EventTable";
-import { EventDetailDialog } from "@/components/advisor/EventDetailDialog";
-import { useState } from "react";
-import { AsyncStates } from "@/components/ui/AsyncStates";
-import { useAdvisorEvents } from "@/lib/useAdvisorEvents";
-
-export default function Page() {
-  const { data, error, isLoading } = useAdvisorEvents();
-  const [selected, setSelected] = useState<string | null>(null);
-
-  if (isLoading) return <AsyncStates state="loading" />;
-  if (error) return <AsyncStates state="error" error="Failed to load events." />;
-  if (!data?.length) return <AsyncStates state="empty" message="No advisor events yet." />;
-
+export default function IacAdvisorPage() {
   return (
-    <>
-      <EventTable rows={data} onRowClick={(id)=>setSelected(id)} />
-      {selected && <EventDetailDialog id={selected} onClose={()=>setSelected(null)} />}
-    </>
+    <section className="space-y-6">
+      <h1 className="text-2xl font-semibold">IaC Advisor</h1>
+      <div className="rounded-lg bg-white p-6 shadow dark:bg-zinc-900">
+        <p className="text-gray-500 dark:text-gray-400">
+          IaC Advisor functionality coming soon.
+        </p>
+      </div>
+    </section>
   );
 }
