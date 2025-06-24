@@ -1,5 +1,5 @@
 "use client";
-import { useEventSource } from "@/src/hooks/useEventSource";
+import { useEventSource } from "../../src/hooks/useEventSource";
 import clsx from "clsx";
 
 export function RemainingBudgetTile({

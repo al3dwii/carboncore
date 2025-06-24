@@ -1,6 +1,6 @@
+import { fetchLedger } from "@/lib/ledger-api";
+import { LedgerTable } from "./LedgerTable.client";
 import Link from "next/link";
-import { fetchLedger } from "@/src/lib/ledger-api";
-import { VirtualTable } from "@/components/ui/VirtualTable";
 
 export async function LedgerPreview({ orgId }: { orgId: string }) {
   const rows = await fetchLedger(orgId, 50);
@@ -9,23 +9,13 @@ export async function LedgerPreview({ orgId }: { orgId: string }) {
     <div>
       <div className="mb-2 flex items-baseline justify-between">
         <h2 className="text-base font-semibold">Latest ledger events</h2>
-        <Link className="text-sm underline" href={`/org/${orgId}/ledger`}>
+        <Link href={`/org/${orgId}/ledger`} className="text-sm underline">
           View all →
         </Link>
       </div>
 
-      <VirtualTable
-        rowHeight={38}
-        rows={rows}
-        columns={[
-          { key: "ts",      header: "Date",    width: 130, cell: (r) => r.ts },
-          { key: "project", header: "Project", width: 160 },
-          { key: "sku",     header: "SKU",     width: 140 },
-          { key: "kwh",     header: "kWh",     width: 100 },
-          { key: "kg",      header: "kg CO₂",  width: 100 },
-        ]}
-        height={300}
-      />
+      {/* Only serialisable data crosses the boundary */}
+      <LedgerTable rows={rows} />
     </div>
   );
 }

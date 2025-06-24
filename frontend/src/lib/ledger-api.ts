@@ -1,4 +1,4 @@
-import { request } from "@/src/lib/request";
+import { request } from "../../src/lib/request";
 export interface LedgerRow {
   id: string;
   ts: string;

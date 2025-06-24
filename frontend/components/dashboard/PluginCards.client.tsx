@@ -1,7 +1,7 @@
 "use client";
 import { useQuery }      from "@tanstack/react-query";
-import { fetchPluginStatus } from "@/src/lib/plugins-api";
-import { PLUGINS }       from "@/src/constants/plugins";
+import { fetchPluginStatus } from "../../src/lib/plugins-api";
+import { PLUGINS }       from "../../src/constants/plugins";
 
 export function PluginCards({ orgId }: { orgId: string }) {
   const queries = PLUGINS.map((p) =>

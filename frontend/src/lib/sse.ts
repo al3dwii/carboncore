@@ -1,27 +1,50 @@
-import { NextResponse } from "next/server";
-
 export function sse(
-  handler: (send: (data: any) => void) => void | (() => void | Promise<void>),
+  streamFn: (
+    send: (data: any) => void,
+    close: () => void,
+  ) => void | (() => void) | Promise<() => void>,
 ) {
-  const stream = new ReadableStream({
-    start(controller) {
-      const encoder = new TextEncoder();
-      const send = (data: any) => {
-        controller.enqueue(encoder.encode(`data: ${JSON.stringify(data)}\n\n`));
-      };
-      let cleanup: void | (() => void | Promise<void>);
-      Promise.resolve(handler(send)).then((fn) => {
-        cleanup = fn;
-      });
-      return () => cleanup && cleanup();
-    },
-  });
+  let cleanup: (() => void) | void;
 
-  return new NextResponse(stream, {
-    headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive",
+  return new Response(
+    new ReadableStream({
+      async start(controller) {
+        let open = true;
+
+        /** safe writer – ignores pushes after close */
+        const send = (data: any) => {
+          if (!open) return;
+          try {
+            controller.enqueue(`data: ${JSON.stringify(data)}\n\n`);
+          } catch {
+            /* controller already closed – ignore */
+          }
+        };
+
+        /** caller can close proactively */
+        const close = () => {
+          if (!open) return;
+          open = false;
+          controller.close();
+          cleanup?.();
+        };
+
+        cleanup = await streamFn(send, close);
+
+        // when the client disconnects (browser tab closed / nav away)
+        this.signal?.addEventListener("abort", close);
+      },
+
+      cancel() {
+        cleanup?.();
+      },
+    }),
+    {
+      headers: {
+        "Content-Type": "text/event-stream",
+        Connection: "keep-alive",
+        "Cache-Control": "no-cache",
+      },
     },
-  });
+  );
 }

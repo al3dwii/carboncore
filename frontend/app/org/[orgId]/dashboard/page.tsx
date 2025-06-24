@@ -1,13 +1,17 @@
 import { DashboardLayout }  from "@/components/dashboard/DashboardLayout";
 import { Suspense }          from "react";
-import { fetchKpis }         from "@/src/lib/kpi-api";
+import { fetchKpis }         from "../../../../src/lib/kpi-api";
 import { KpiGrid }           from "@/components/kpi/KpiGrid";
-import { QuickActions }      from "@/components/dashboard/QuickActions";
+import { QuickActions }      from "../../../../components/dashboard/QuickActions";
 import { AlertBanner }       from "@/components/alerts/AlertBanner";
 import { EmissionChart }     from "@/components/dashboard/EmissionChart.client";
 import { LedgerPreview }     from "@/components/ledger/LedgerPreview";
 import { PageMetrics }       from "@/components/dashboard/PageMetrics.client";
 import { PluginCards }       from "@/components/dashboard/PluginCards.client";
+import { fetchAlertCount }    from "@/lib/alerts-api";
+import { fetchCurrentBudget } from "@/lib/budget-api";
+import { ChartSkeleton } from "@/components/ui/ChartSkeleton";
+
 
 export default async function DashboardPage({
   params: { orgId },
@@ -36,9 +40,9 @@ export default async function DashboardPage({
       />
 
       {/* Row 3 – 30 day emissions vs budget chart */}
-      <Suspense fallback={<ChartSkeleton />}>
+      {/* <Suspense fallback={<ChartSkeleton />}> */}
         <EmissionChart orgId={orgId} />
-      </Suspense>
+      {/* </Suspense> */}
 
       {/* Row 4 – recent ledger events */}
       <LedgerPreview orgId={orgId} />

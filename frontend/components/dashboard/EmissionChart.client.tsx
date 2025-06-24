@@ -2,7 +2,8 @@
 import { useQuery }               from "@tanstack/react-query";
 import { Line }                   from "react-chartjs-2";
 import { Chart, LineElement, CategoryScale, LinearScale, PointElement } from "chart.js";
-import { fetch30dEmissions }      from "@/src/lib/emissions-api";
+import { fetch30dEmissions }      from "../../src/lib/emissions-api";
+import { ChartSkeleton } from "@/components/ui/ChartSkeleton";
 
 Chart.register(LineElement, CategoryScale, LinearScale, PointElement);
 
