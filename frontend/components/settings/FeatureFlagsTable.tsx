@@ -1,6 +1,6 @@
 "use client";
 import { useFlags } from "@/lib/useFlags";
-import { useOrg } from "@/lib/useOrg";
+import { useOrg } from "@/contexts/OrgContext";
 import { patchFlag } from "@/lib/flags-api";
 import { Switch } from "@/components/ui/Switch";
 import { toastSuccess, toastError } from "@/lib/toast";
